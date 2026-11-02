@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { getDictionary, Locale, formatCurrency } from "@/lib/i18n";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { Shield, ArrowRight, CheckCircle2, Ticket, Trophy, TrendingUp } from "lucide-react";
+import { Shield, ArrowRight, CheckCircle2, Ticket, Trophy, Flame } from "lucide-react";
 
 export default async function HomePage() {
   const cookieStore = await cookies();
@@ -116,9 +116,9 @@ export default async function HomePage() {
                         {formatCurrency(effectiveMaxCents, type.currency, locale)}
                       </span>
                     </div>
-                    <div className="flex items-center gap-1.5 text-xs text-emerald-400 font-bold px-1">
-                      <TrendingUp className="w-3.5 h-3.5 text-emerald-400 shrink-0 animate-pulse" />
-                      <span>Jackpot Évolutif (+40% réserve)</span>
+                    <div className="flex items-center gap-1.5 text-xs text-amber-400 font-bold px-1">
+                      <Flame className="w-3.5 h-3.5 text-amber-400 shrink-0 fill-amber-400" />
+                      <span>Super Jackpot en direct</span>
                     </div>
                   </div>
 
