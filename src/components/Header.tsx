@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Translations, formatCurrency, Locale } from "@/lib/i18n";
-import { Wallet, LogOut, Shield, Ticket, Menu, X, Globe, User } from "lucide-react";
+import { Wallet, LogOut, Shield, Ticket, Menu, X, Globe, User, Smartphone } from "lucide-react";
 
 interface HeaderProps {
   user: {
@@ -247,6 +247,19 @@ export default function Header({ user, t, currentLocale }: HeaderProps) {
             >
               📜 Règles & Cotes du jeu
             </Link>
+          </div>
+
+          {/* Téléchargement APK Android direct */}
+          <div className="pt-1">
+            <a
+              href="/GRATIKO.apk"
+              download="GRATIKO.apk"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center justify-center gap-2 w-full py-2.5 px-3 bg-emerald-600/15 hover:bg-emerald-600/25 text-emerald-300 font-bold text-xs rounded-xl border border-emerald-500/30 transition-colors shadow-sm"
+            >
+              <Smartphone className="w-4 h-4 text-emerald-400" />
+              <span>📱 Télécharger l'App Android (.apk)</span>
+            </a>
           </div>
 
           {/* Boutons d'action non-connecté sur Mobile */}

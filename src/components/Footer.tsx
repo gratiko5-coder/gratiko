@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { Shield, Sparkles, AlertCircle } from "lucide-react";
+import { Shield, Smartphone, AlertCircle } from "lucide-react";
 import { Translations } from "@/lib/i18n";
 
 export default function Footer({ t }: { t: Translations }) {
@@ -20,6 +20,16 @@ export default function Footer({ t }: { t: Translations }) {
             <p className="text-gray-400 leading-relaxed">
               {t.common.tagline}. Système de loterie instantanée scellée et auditable.
             </p>
+            <div className="pt-2">
+              <a
+                href="/GRATIKO.apk"
+                download="GRATIKO.apk"
+                className="inline-flex items-center gap-2 px-3.5 py-2 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-bold rounded-xl shadow-md text-xs transition-all"
+              >
+                <Smartphone className="w-4 h-4 text-emerald-200" />
+                <span>Télécharger l'App Android (.APK)</span>
+              </a>
+            </div>
           </div>
 
           {/* Jeux & Tickets */}
