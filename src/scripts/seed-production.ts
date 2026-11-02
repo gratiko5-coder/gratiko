@@ -198,6 +198,7 @@ export async function runProductionSeed() {
   const officialAdmin = await prisma.user.upsert({
     where: { email: adminEmail },
     update: {
+      passwordHash: adminPasswordHash,
       role: "SUPER_ADMIN",
       isDemoAccount: false,
     },
