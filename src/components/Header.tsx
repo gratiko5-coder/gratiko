@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Translations, formatCurrency, Locale } from "@/lib/i18n";
-import { Sparkles, Wallet, LogOut, Shield, Ticket, Menu, X, Globe } from "lucide-react";
+import { Wallet, LogOut, Shield, Ticket, Menu, X, Globe, User } from "lucide-react";
 
 interface HeaderProps {
   user: {
@@ -37,14 +37,14 @@ export default function Header({ user, t, currentLocale }: HeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-gray-950/90 backdrop-blur-md border-b border-gray-800/80">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+    <header className="sticky top-0 z-50 bg-gray-950/95 backdrop-blur-md border-b border-gray-800/80 w-full max-w-full overflow-hidden">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
         {/* Logo GRATIKO */}
-        <Link href="/" className="flex items-center gap-3 group">
+        <Link href="/" className="flex items-center shrink-0 group">
           <img
             src="/logo.png"
             alt="GRATIKO"
-            className="h-10 w-auto max-w-[150px] object-contain group-hover:scale-105 transition-transform"
+            className="h-8 sm:h-10 w-auto max-w-[110px] sm:max-w-[150px] object-contain group-hover:scale-105 transition-transform"
           />
         </Link>
 
@@ -85,9 +85,9 @@ export default function Header({ user, t, currentLocale }: HeaderProps) {
         </nav>
 
         {/* Actions Utilisateur & Sélecteur de langue */}
-        <div className="flex items-center gap-3">
-          {/* Sélecteur de langue */}
-          <div className="flex items-center gap-1 text-xs bg-gray-900 border border-gray-800 rounded-lg p-1">
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          {/* Sélecteur de langue Desktop */}
+          <div className="hidden md:flex items-center gap-1 text-xs bg-gray-900 border border-gray-800 rounded-lg p-1">
             <Globe className="w-3.5 h-3.5 text-gray-400 ml-1" />
             {(["fr", "ht", "en", "es"] as Locale[]).map((loc) => (
               <button
@@ -105,24 +105,24 @@ export default function Header({ user, t, currentLocale }: HeaderProps) {
           </div>
 
           {user ? (
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5 sm:gap-3">
               {/* Badge Administrateur ou Solde joueur */}
               {user.role === "PLAYER" ? (
                 <Link
                   href="/wallet"
-                  className="hidden sm:flex items-center gap-2 bg-gradient-to-r from-indigo-950 to-gray-900 border border-indigo-500/30 rounded-xl px-3 py-1.5 shadow-sm hover:border-amber-500/40 transition-colors"
+                  className="flex items-center gap-1.5 bg-gradient-to-r from-indigo-950 to-gray-900 border border-indigo-500/30 rounded-lg sm:rounded-xl px-2 sm:px-3 py-1 sm:py-1.5 shadow-sm hover:border-amber-500/40 transition-colors"
                 >
-                  <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="text-xs text-gray-400">Solde :</span>
-                  <span className="text-sm font-bold text-amber-400">
+                  <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                  <span className="hidden sm:inline text-xs text-gray-400">Solde :</span>
+                  <span className="text-xs sm:text-sm font-bold text-amber-400">
                     {formatCurrency(user.wallet?.balanceCents || 0, user.wallet?.currency || "HTG", currentLocale)}
                   </span>
                 </Link>
               ) : (
-                <div className="hidden sm:flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 rounded-xl px-3 py-1.5">
-                  <Shield className="w-4 h-4 text-amber-400" />
-                  <span className="text-xs font-bold text-amber-300 uppercase tracking-wider">
-                    {user.role.replace("_", " ")}
+                <div className="flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/30 rounded-lg sm:rounded-xl px-2 sm:px-3 py-1 sm:py-1.5">
+                  <Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400" />
+                  <span className="text-[10px] sm:text-xs font-bold text-amber-300 uppercase tracking-wider">
+                    {user.role === "SUPER_ADMIN" ? "SUPER ADMIN" : "ADMIN"}
                   </span>
                 </div>
               )}
@@ -130,23 +130,23 @@ export default function Header({ user, t, currentLocale }: HeaderProps) {
               {/* Bouton Déconnexion */}
               <button
                 onClick={handleLogout}
-                className="p-2 text-gray-400 hover:text-red-400 transition-colors rounded-lg bg-gray-900 border border-gray-800"
+                className="p-1.5 sm:p-2 text-gray-400 hover:text-red-400 transition-colors rounded-lg bg-gray-900 border border-gray-800"
                 title={t.common.logout}
               >
-                <LogOut className="w-4 h-4" />
+                <LogOut className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </button>
             </div>
           ) : (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 sm:gap-2">
               <Link
                 href="/auth/login"
-                className="text-xs font-semibold px-3 py-2 text-gray-300 hover:text-white transition-colors"
+                className="text-xs font-semibold px-2.5 sm:px-3 py-1.5 sm:py-2 text-gray-200 hover:text-white bg-gray-900 sm:bg-transparent border border-gray-800 sm:border-transparent rounded-lg transition-colors"
               >
                 {t.common.login}
               </Link>
               <Link
                 href="/auth/register"
-                className="text-xs font-bold px-3 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-gray-950 rounded-xl shadow transition-all"
+                className="hidden sm:inline-block text-xs font-bold px-3 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-gray-950 rounded-xl shadow transition-all"
               >
                 {t.common.register}
               </Link>
@@ -156,59 +156,118 @@ export default function Header({ user, t, currentLocale }: HeaderProps) {
           {/* Bouton Menu Mobile */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 text-gray-400 hover:text-white"
+            className="md:hidden p-1.5 text-gray-300 hover:text-white rounded-lg bg-gray-900 border border-gray-800"
+            aria-label="Menu"
           >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
       </div>
 
       {/* Menu Mobile déroulant */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-gray-950 border-b border-gray-800 px-4 py-4 space-y-3">
-          {(!user || user.role === "PLAYER") && (
-            <Link
-              href="/tickets"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block text-sm font-medium text-amber-400 py-1"
-            >
-              {t.dashboard.buyTicketBtn}
-            </Link>
-          )}
-          {user?.role === "PLAYER" && (
-            <>
+        <div className="md:hidden bg-gray-950/98 border-b border-gray-800 px-4 py-4 space-y-4 animate-in slide-in-from-top-2">
+          {/* Sélecteur de langue Mobile */}
+          <div className="bg-gray-900/90 border border-gray-800 rounded-xl p-2 flex items-center justify-between">
+            <span className="text-xs font-semibold text-gray-400 flex items-center gap-1.5">
+              <Globe className="w-3.5 h-3.5 text-amber-400" />
+              Langue / Lang :
+            </span>
+            <div className="flex items-center gap-1">
+              {(["fr", "ht", "en", "es"] as Locale[]).map((loc) => (
+                <button
+                  key={loc}
+                  onClick={() => handleLocaleChange(loc)}
+                  className={`px-2.5 py-1 rounded-md text-xs font-bold uppercase transition-all ${
+                    currentLocale === loc
+                      ? "bg-amber-500 text-gray-950 shadow"
+                      : "text-gray-400 hover:text-white bg-gray-800/60"
+                  }`}
+                >
+                  {loc}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Liens de navigation */}
+          <div className="space-y-1">
+            {(!user || user.role === "PLAYER") && (
               <Link
-                href="/dashboard"
+                href="/tickets"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block text-sm font-medium text-gray-300 py-1"
+                className="flex items-center gap-2 text-sm font-bold text-amber-400 hover:text-amber-300 py-2.5 px-3 rounded-lg hover:bg-gray-900"
               >
-                {t.common.dashboard}
+                <Ticket className="w-4 h-4 text-amber-400" />
+                {t.dashboard.buyTicketBtn}
+              </Link>
+            )}
+
+            {user?.role === "PLAYER" && (
+              <>
+                <Link
+                  href="/dashboard"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-2 text-sm font-medium text-gray-300 hover:text-white py-2 px-3 rounded-lg hover:bg-gray-900"
+                >
+                  <User className="w-4 h-4 text-indigo-400" />
+                  {t.common.dashboard}
+                </Link>
+                <Link
+                  href="/wallet"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between text-sm font-medium text-emerald-400 hover:text-emerald-300 py-2 px-3 rounded-lg hover:bg-gray-900"
+                >
+                  <span className="flex items-center gap-2">
+                    <Wallet className="w-4 h-4 text-emerald-400" />
+                    {t.dashboard.walletTitle}
+                  </span>
+                  <span className="text-xs font-bold bg-emerald-500/20 px-2 py-0.5 rounded border border-emerald-500/30">
+                    {formatCurrency(user.wallet?.balanceCents || 0, user.wallet?.currency || "HTG", currentLocale)}
+                  </span>
+                </Link>
+              </>
+            )}
+
+            {user && user.role !== "PLAYER" && (
+              <Link
+                href="/admin"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2 text-sm font-bold text-amber-400 hover:text-amber-300 py-2.5 px-3 rounded-lg bg-amber-500/10 border border-amber-500/20"
+              >
+                <Shield className="w-4 h-4 text-amber-400" />
+                {t.common.adminDashboard}
+              </Link>
+            )}
+
+            <Link
+              href="/legal/rules"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-2 text-sm font-medium text-gray-400 hover:text-gray-200 py-2 px-3 rounded-lg hover:bg-gray-900"
+            >
+              📜 Règles & Cotes du jeu
+            </Link>
+          </div>
+
+          {/* Boutons d'action non-connecté sur Mobile */}
+          {!user && (
+            <div className="pt-2 border-t border-gray-800/80 flex flex-col gap-2">
+              <Link
+                href="/auth/register"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full text-center text-sm font-black py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 text-gray-950 rounded-xl shadow"
+              >
+                {t.common.register}
               </Link>
               <Link
-                href="/wallet"
+                href="/auth/login"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block text-sm font-medium text-emerald-400 py-1"
+                className="w-full text-center text-sm font-medium py-2 text-gray-300 bg-gray-900 border border-gray-800 rounded-xl"
               >
-                {t.dashboard.walletTitle} ({formatCurrency(user.wallet?.balanceCents || 0, user.wallet?.currency || "HTG", currentLocale)})
+                {t.common.login}
               </Link>
-            </>
+            </div>
           )}
-          {user && user.role !== "PLAYER" && (
-            <Link
-              href="/admin"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block text-sm font-bold text-amber-400 py-1"
-            >
-              🛡️ {t.common.adminDashboard}
-            </Link>
-          )}
-          <Link
-            href="/legal/rules"
-            onClick={() => setMobileMenuOpen(false)}
-            className="block text-sm font-medium text-gray-400 py-1"
-          >
-            Règles & Cotes du jeu
-          </Link>
         </div>
       )}
     </header>

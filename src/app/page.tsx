@@ -24,50 +24,50 @@ export default async function HomePage() {
   });
 
   return (
-    <div className="space-y-16 py-8">
+    <div className="space-y-10 sm:space-y-16 py-3 sm:py-8 w-full max-w-full overflow-hidden">
       {/* Hero Section */}
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-950 via-gray-900 to-black p-8 md:p-14 border border-indigo-500/20 shadow-2xl">
-        <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-96 h-96 rounded-full bg-indigo-500/10 blur-3xl pointer-events-none" />
+      <section className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-indigo-950 via-gray-900 to-black p-5 sm:p-8 md:p-14 border border-indigo-500/20 shadow-2xl">
+        <div className="absolute top-0 right-0 -mr-20 -mt-20 w-72 sm:w-96 h-72 sm:h-96 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-72 sm:w-96 h-72 sm:h-96 rounded-full bg-indigo-500/10 blur-3xl pointer-events-none" />
 
-        <div className="relative max-w-3xl space-y-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs font-bold uppercase tracking-wider">
-            <Sparkles className="w-4 h-4 text-amber-400" />
-            Lancement Caraïbes & International
+        <div className="relative max-w-3xl space-y-4 sm:space-y-6">
+          <div className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-300 text-[11px] sm:text-xs font-bold uppercase tracking-wider">
+            <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400 shrink-0" />
+            <span>Lancement Caraïbes & International</span>
           </div>
 
-          <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-white leading-tight">
+          <h1 className="text-2xl sm:text-5xl md:text-6xl font-black tracking-tight text-white leading-tight break-words">
             Grattez en direct. <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-200 to-indigo-400">
               Gagnez instantanément.
             </span>
           </h1>
 
-          <p className="text-lg text-gray-300 leading-relaxed max-w-2xl">
+          <p className="text-sm sm:text-lg text-gray-300 leading-relaxed max-w-2xl break-words">
             {t.common.tagline}. Une expérience fluide sur mobile, des résultats scellés par cryptographie côté serveur et un portefeuille transparent.
           </p>
 
-          <div className="flex flex-wrap gap-4 pt-4">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-2 sm:pt-4">
             <Link
               href="/tickets"
-              className="px-6 py-3.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-gray-950 font-black rounded-2xl shadow-xl shadow-amber-500/20 transition-all flex items-center gap-2 text-base"
+              className="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-gray-950 font-black rounded-xl sm:rounded-2xl shadow-xl shadow-amber-500/20 transition-all flex items-center justify-center gap-2 text-sm sm:text-base"
             >
-              <Ticket className="w-5 h-5 text-gray-950" />
-              {t.dashboard.buyTicketBtn}
-              <ArrowRight className="w-4 h-4" />
+              <Ticket className="w-4 h-4 sm:w-5 sm:h-5 text-gray-950 shrink-0" />
+              <span>{t.dashboard.buyTicketBtn}</span>
+              <ArrowRight className="w-4 h-4 shrink-0" />
             </Link>
 
             {user ? (
               <Link
                 href="/dashboard"
-                className="px-6 py-3.5 bg-gray-900 hover:bg-gray-800 text-white font-bold rounded-2xl border border-gray-700 transition-colors flex items-center gap-2 text-base"
+                className="w-full sm:w-auto px-6 py-3.5 bg-gray-900 hover:bg-gray-800 text-white font-bold rounded-xl sm:rounded-2xl border border-gray-700 transition-colors flex items-center justify-center gap-2 text-sm sm:text-base"
               >
                 {t.common.dashboard}
               </Link>
             ) : (
               <Link
                 href="/auth/register"
-                className="px-6 py-3.5 bg-gray-900 hover:bg-gray-800 text-white font-bold rounded-2xl border border-gray-700 transition-colors flex items-center gap-2 text-base"
+                className="w-full sm:w-auto px-6 py-3.5 bg-gray-900 hover:bg-gray-800 text-white font-bold rounded-xl sm:rounded-2xl border border-gray-700 transition-colors flex items-center justify-center gap-2 text-sm sm:text-base"
               >
                 {t.auth.registerButton}
               </Link>
@@ -77,18 +77,18 @@ export default async function HomePage() {
       </section>
 
       {/* Catalogue en vedette */}
-      <section className="space-y-6">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-2">
+      <section className="space-y-4 sm:space-y-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2">
           <div>
-            <h2 className="text-2xl sm:text-3xl font-black text-white">{t.tickets.catalogTitle}</h2>
-            <p className="text-sm text-gray-400">{t.tickets.catalogSubtitle}</p>
+            <h2 className="text-xl sm:text-3xl font-black text-white">{t.tickets.catalogTitle}</h2>
+            <p className="text-xs sm:text-sm text-gray-400">{t.tickets.catalogSubtitle}</p>
           </div>
-          <Link href="/tickets" className="text-amber-400 hover:text-amber-300 text-sm font-semibold flex items-center gap-1">
-            Voir toute la sélection <ArrowRight className="w-4 h-4" />
+          <Link href="/tickets" className="text-amber-400 hover:text-amber-300 text-xs sm:text-sm font-semibold flex items-center gap-1">
+            Voir toute la sélection <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {ticketTypes.map((type) => {
             const baseMaxPrizeCents = type.batches[0]?.prizeTiers.reduce(
               (max, tier) => Math.max(max, tier.prizeAmountCents),
@@ -103,12 +103,12 @@ export default async function HomePage() {
             return (
               <div
                 key={type.id}
-                className="rounded-3xl bg-gray-900/60 border border-gray-800 hover:border-amber-500/40 p-6 flex flex-col justify-between transition-all hover:scale-[1.02] shadow-xl group"
+                className="rounded-2xl sm:rounded-3xl bg-gray-900/60 border border-gray-800 hover:border-amber-500/40 p-4 sm:p-6 flex flex-col justify-between transition-all hover:scale-[1.01] shadow-xl group"
               >
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   <div className="flex justify-between items-start gap-2">
                     <div className="flex flex-col gap-1">
-                      <div className="flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-amber-500/20 via-amber-400/30 to-amber-500/20 text-amber-300 border border-amber-500/40 rounded-xl text-xs font-black tracking-wide uppercase shadow-sm">
+                      <div className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 bg-gradient-to-r from-amber-500/20 via-amber-400/30 to-amber-500/20 text-amber-300 border border-amber-500/40 rounded-xl text-[11px] sm:text-xs font-black tracking-wide uppercase shadow-sm">
                         <Trophy className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                         <span>Max : {formatCurrency(effectiveMaxCents, type.currency, locale)}</span>
                       </div>
@@ -117,20 +117,20 @@ export default async function HomePage() {
                         <span>Jackpot Évolutif (+40% réserve)</span>
                       </div>
                     </div>
-                    <div className="w-9 h-9 rounded-xl bg-gray-800 group-hover:bg-amber-500/20 flex items-center justify-center transition-colors shrink-0">
+                    <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gray-800 group-hover:bg-amber-500/20 flex items-center justify-center transition-colors shrink-0">
                       <Sparkles className="w-4 h-4 text-amber-400" />
                     </div>
                   </div>
 
                   <div>
-                    <h3 className="text-xl font-black text-white">{type.name}</h3>
-                    <p className="text-xs text-gray-400 mt-2 line-clamp-2 leading-relaxed">
+                    <h3 className="text-lg sm:text-xl font-black text-white">{type.name}</h3>
+                    <p className="text-xs text-gray-400 mt-1 sm:mt-2 line-clamp-2 leading-relaxed">
                       {type.description}
                     </p>
                   </div>
                 </div>
 
-                <div className="mt-6 pt-4 border-t border-gray-800/80 space-y-2">
+                <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-gray-800/80 space-y-2">
                   <div className="flex justify-between items-center text-xs">
                     <span className="text-gray-400">Prix du ticket :</span>
                     <span className="font-bold text-amber-400">{formatCurrency(type.priceCents, type.currency, locale)}</span>
@@ -149,40 +149,40 @@ export default async function HomePage() {
       </section>
 
       {/* Piliers de Sécurité & Transparence */}
-      <section className="rounded-3xl bg-gray-900/40 border border-gray-800 p-8 md:p-12 space-y-8">
+      <section className="rounded-2xl sm:rounded-3xl bg-gray-900/40 border border-gray-800 p-5 sm:p-8 md:p-12 space-y-6 sm:space-y-8">
         <div className="text-center max-w-2xl mx-auto space-y-2">
-          <h2 className="text-2xl font-black text-white">Pourquoi GRATIKO est unique</h2>
+          <h2 className="text-xl sm:text-2xl font-black text-white">Pourquoi GRATIKO est unique</h2>
           <p className="text-xs sm:text-sm text-gray-400">
             Une architecture conçue selon les plus hauts standards de rigueur financière et informatique.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="p-6 rounded-2xl bg-gray-950/60 border border-gray-800 space-y-3">
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+          <div className="p-4 sm:p-6 rounded-2xl bg-gray-950/60 border border-gray-800 space-y-3">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400">
               <Shield className="w-5 h-5" />
             </div>
-            <h3 className="text-base font-bold text-white">Résultats Scellés Côté Serveur</h3>
+            <h3 className="text-sm sm:text-base font-bold text-white">Résultats Scellés Côté Serveur</h3>
             <p className="text-xs text-gray-400 leading-relaxed">
               Le résultat est tiré par cryptographie côté serveur dès l'achat. L'animation visuelle de grattage n'altère en aucun cas l'issue scellée.
             </p>
           </div>
 
-          <div className="p-6 rounded-2xl bg-gray-950/60 border border-gray-800 space-y-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-400">
+          <div className="p-4 sm:p-6 rounded-2xl bg-gray-950/60 border border-gray-800 space-y-3">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-400">
               <Coins className="w-5 h-5" />
             </div>
-            <h3 className="text-base font-bold text-white">Grand Livre à Double Entrée</h3>
+            <h3 className="text-sm sm:text-base font-bold text-white">Grand Livre à Double Entrée</h3>
             <p className="text-xs text-gray-400 leading-relaxed">
               Chaque opération (recharge, achat, commission 20%, réserve 40%, gain, retrait) est traçable avec écritures équilibrées Débit / Crédit.
             </p>
           </div>
 
-          <div className="p-6 rounded-2xl bg-gray-950/60 border border-gray-800 space-y-3">
-            <div className="w-10 h-10 rounded-xl bg-indigo-500/20 flex items-center justify-center text-indigo-400">
+          <div className="p-4 sm:p-6 rounded-2xl bg-gray-950/60 border border-gray-800 space-y-3">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-indigo-500/20 flex items-center justify-center text-indigo-400">
               <CheckCircle2 className="w-5 h-5" />
             </div>
-            <h3 className="text-base font-bold text-white">Multilingue & International</h3>
+            <h3 className="text-sm sm:text-base font-bold text-white">Multilingue & International</h3>
             <p className="text-xs text-gray-400 leading-relaxed">
               Conçu d'origine en créole haïtien et en français, adaptable immédiatement pour les Caraïbes et l'Afrique.
             </p>

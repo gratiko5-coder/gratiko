@@ -1,0 +1,43 @@
+{
+  "name": "GRATIKO — Plateforme de Tickets à Gratter",
+  "short_name": "GRATIKO",
+  "description": "Plateforme numérique officielle de tickets virtuels à gratter et jeux instantanés.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b0f19",
+  "theme_color": "#0b0f19",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["games", "entertainment"],
+  "shortcuts": [
+    {
+      "name": "Acheter un ticket",
+      "url": "/tickets",
+      "description": "Accéder aux tickets à gratter disponibles"
+    },
+    {
+      "name": "Mon Portefeuille",
+      "url": "/wallet",
+      "description": "Gérer mes recharges et retraits"
+    }
+  ]
+}
