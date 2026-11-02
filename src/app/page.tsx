@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { getDictionary, Locale, formatCurrency } from "@/lib/i18n";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { Sparkles, Shield, Coins, ArrowRight, CheckCircle2, Ticket, Trophy, TrendingUp } from "lucide-react";
+import { Shield, ArrowRight, CheckCircle2, Ticket, Trophy, TrendingUp } from "lucide-react";
 
 export default async function HomePage() {
   const cookieStore = await cookies();
@@ -31,8 +31,7 @@ export default async function HomePage() {
         <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-72 sm:w-96 h-72 sm:h-96 rounded-full bg-indigo-500/10 blur-3xl pointer-events-none" />
 
         <div className="relative max-w-3xl space-y-4 sm:space-y-6">
-          <div className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-300 text-[11px] sm:text-xs font-bold uppercase tracking-wider">
-            <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400 shrink-0" />
+          <div className="inline-flex items-center px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-300 text-[11px] sm:text-xs font-bold uppercase tracking-wider">
             <span>Lancement Caraïbes & International</span>
           </div>
 
@@ -103,22 +102,23 @@ export default async function HomePage() {
             return (
               <div
                 key={type.id}
-                className="rounded-2xl sm:rounded-3xl bg-gray-900/60 border border-gray-800 hover:border-amber-500/40 p-4 sm:p-6 flex flex-col justify-between transition-all hover:scale-[1.01] shadow-xl group"
+                className="rounded-2xl sm:rounded-3xl bg-gray-900/70 border border-gray-800 hover:border-amber-500/50 p-4 sm:p-6 flex flex-col justify-between transition-all hover:scale-[1.01] shadow-xl group"
               >
-                <div className="space-y-3 sm:space-y-4">
-                  <div className="flex justify-between items-start gap-2">
-                    <div className="flex flex-col gap-1">
-                      <div className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 bg-gradient-to-r from-amber-500/20 via-amber-400/30 to-amber-500/20 text-amber-300 border border-amber-500/40 rounded-xl text-[11px] sm:text-xs font-black tracking-wide uppercase shadow-sm">
-                        <Trophy className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                        <span>Max : {formatCurrency(effectiveMaxCents, type.currency, locale)}</span>
+                <div className="space-y-4">
+                  {/* Bannière Montant Maximum Haute Visibilité */}
+                  <div className="flex flex-col gap-1.5 w-full">
+                    <div className="flex items-center justify-between bg-gradient-to-r from-amber-500/20 via-amber-400/15 to-amber-500/10 border-2 border-amber-500/50 rounded-2xl px-3.5 py-2 shadow-md">
+                      <div className="flex items-center gap-1.5">
+                        <Trophy className="w-4 h-4 text-amber-400 shrink-0" />
+                        <span className="text-[11px] sm:text-xs font-bold text-gray-300 uppercase tracking-wider">Max :</span>
                       </div>
-                      <div className="flex items-center gap-1 text-[10px] text-emerald-400 font-bold px-0.5">
-                        <TrendingUp className="w-3 h-3 text-emerald-400 shrink-0 animate-pulse" />
-                        <span>Jackpot Évolutif (+40% réserve)</span>
-                      </div>
+                      <span className="text-base sm:text-lg font-black text-amber-300 font-mono tracking-tight drop-shadow">
+                        {formatCurrency(effectiveMaxCents, type.currency, locale)}
+                      </span>
                     </div>
-                    <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gray-800 group-hover:bg-amber-500/20 flex items-center justify-center transition-colors shrink-0">
-                      <Sparkles className="w-4 h-4 text-amber-400" />
+                    <div className="flex items-center gap-1.5 text-xs text-emerald-400 font-bold px-1">
+                      <TrendingUp className="w-3.5 h-3.5 text-emerald-400 shrink-0 animate-pulse" />
+                      <span>Jackpot Évolutif (+40% réserve)</span>
                     </div>
                   </div>
 
@@ -130,14 +130,16 @@ export default async function HomePage() {
                   </div>
                 </div>
 
-                <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-gray-800/80 space-y-2">
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="text-gray-400">Prix du ticket :</span>
-                    <span className="font-bold text-amber-400">{formatCurrency(type.priceCents, type.currency, locale)}</span>
+                <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-gray-800/80 space-y-3">
+                  <div className="flex justify-between items-center py-0.5">
+                    <span className="text-xs font-semibold text-gray-400">Prix du ticket :</span>
+                    <span className="text-base sm:text-lg font-black text-amber-400 font-mono">
+                      {formatCurrency(type.priceCents, type.currency, locale)}
+                    </span>
                   </div>
                   <Link
                     href={`/tickets?type=${type.id}`}
-                    className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl flex items-center justify-center gap-2 text-xs transition-colors shadow"
+                    className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl flex items-center justify-center gap-2 text-sm transition-colors shadow-lg"
                   >
                     {t.tickets.buyNow}
                   </Link>
@@ -148,17 +150,17 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Piliers de Sécurité & Transparence */}
+      {/* Piliers de Sécurité & Transparence (Sans jargon comptable interne) */}
       <section className="rounded-2xl sm:rounded-3xl bg-gray-900/40 border border-gray-800 p-5 sm:p-8 md:p-12 space-y-6 sm:space-y-8">
         <div className="text-center max-w-2xl mx-auto space-y-2">
           <h2 className="text-xl sm:text-2xl font-black text-white">Pourquoi GRATIKO est unique</h2>
           <p className="text-xs sm:text-sm text-gray-400">
-            Une architecture conçue selon les plus hauts standards de rigueur financière et informatique.
+            Une architecture conçue selon les plus hauts standards de transparence et de sécurité informatique.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-          <div className="p-4 sm:p-6 rounded-2xl bg-gray-950/60 border border-gray-800 space-y-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+          <div className="p-5 sm:p-6 rounded-2xl bg-gray-950/60 border border-gray-800 space-y-3">
             <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400">
               <Shield className="w-5 h-5" />
             </div>
@@ -168,17 +170,7 @@ export default async function HomePage() {
             </p>
           </div>
 
-          <div className="p-4 sm:p-6 rounded-2xl bg-gray-950/60 border border-gray-800 space-y-3">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-400">
-              <Coins className="w-5 h-5" />
-            </div>
-            <h3 className="text-sm sm:text-base font-bold text-white">Grand Livre à Double Entrée</h3>
-            <p className="text-xs text-gray-400 leading-relaxed">
-              Chaque opération (recharge, achat, commission 20%, réserve 40%, gain, retrait) est traçable avec écritures équilibrées Débit / Crédit.
-            </p>
-          </div>
-
-          <div className="p-4 sm:p-6 rounded-2xl bg-gray-950/60 border border-gray-800 space-y-3">
+          <div className="p-5 sm:p-6 rounded-2xl bg-gray-950/60 border border-gray-800 space-y-3">
             <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-indigo-500/20 flex items-center justify-center text-indigo-400">
               <CheckCircle2 className="w-5 h-5" />
             </div>

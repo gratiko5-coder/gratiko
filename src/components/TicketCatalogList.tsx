@@ -124,25 +124,26 @@ export default function TicketCatalogList({
               <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-2xl pointer-events-none" />
 
               <div className="space-y-4">
-                <div className="flex justify-between items-start gap-2">
-                  <div className="flex flex-col gap-1">
-                    <div className="flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-amber-500/20 via-amber-400/30 to-amber-500/20 text-amber-300 border border-amber-500/40 rounded-xl text-xs font-black tracking-wide uppercase shadow-sm">
-                      <Trophy className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                      <span>Max : {formatCurrency(effectiveMaxCents, type.currency, locale)}</span>
+                {/* Bannière Montant Maximum Haute Visibilité */}
+                <div className="flex flex-col gap-1.5 w-full">
+                  <div className="flex items-center justify-between bg-gradient-to-r from-amber-500/20 via-amber-400/15 to-amber-500/10 border-2 border-amber-500/50 rounded-2xl px-3.5 py-2 shadow-md">
+                    <div className="flex items-center gap-1.5">
+                      <Trophy className="w-4 h-4 text-amber-400 shrink-0" />
+                      <span className="text-xs font-bold text-gray-300 uppercase tracking-wider">Max :</span>
                     </div>
-                    <div className="flex items-center gap-1 text-[10px] text-emerald-400 font-bold px-0.5">
-                      <TrendingUp className="w-3 h-3 text-emerald-400 shrink-0 animate-pulse" />
-                      <span>Jackpot Évolutif (+40% réserve)</span>
-                    </div>
+                    <span className="text-base sm:text-lg font-black text-amber-300 font-mono tracking-tight drop-shadow">
+                      {formatCurrency(effectiveMaxCents, type.currency, locale)}
+                    </span>
                   </div>
-                  <div className="w-9 h-9 rounded-xl bg-gray-800 group-hover:bg-amber-500/20 flex items-center justify-center transition-colors shrink-0">
-                    <Sparkles className="w-4 h-4 text-amber-400" />
+                  <div className="flex items-center gap-1.5 text-xs text-emerald-400 font-bold px-1">
+                    <TrendingUp className="w-3.5 h-3.5 text-emerald-400 shrink-0 animate-pulse" />
+                    <span>Jackpot Évolutif (+40% réserve)</span>
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="text-2xl font-black text-white">{type.name}</h3>
-                  <p className="text-xs text-gray-400 mt-2 leading-relaxed">
+                  <h3 className="text-xl sm:text-2xl font-black text-white">{type.name}</h3>
+                  <p className="text-xs text-gray-400 mt-1.5 leading-relaxed">
                     {type.description}
                   </p>
                 </div>
