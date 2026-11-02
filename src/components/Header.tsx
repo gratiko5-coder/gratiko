@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Translations, formatCurrency, Locale } from "@/lib/i18n";
-import { Wallet, LogOut, Shield, Ticket, Menu, X, Globe, User, Smartphone } from "lucide-react";
+import { Wallet, LogOut, Shield, Ticket, Menu, X, Globe, User, Smartphone, Trophy } from "lucide-react";
 import { subscribeWalletSync } from "@/lib/wallet-sync";
 
 interface HeaderProps {
@@ -110,17 +110,23 @@ export default function Header({ user, t, currentLocale }: HeaderProps) {
 
         {/* Navigation Desktop */}
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-gray-300">
-          {(!user || user.role === "PLAYER") && (
-            <Link href="/tickets" className="hover:text-amber-400 transition-colors flex items-center gap-1.5">
-              <Ticket className="w-4 h-4 text-amber-400" />
-              {t.dashboard.buyTicketBtn}
-            </Link>
-          )}
+          <Link href="/sports" className="hover:text-amber-400 transition-colors flex items-center gap-1.5 font-bold text-white">
+            <Trophy className="w-4 h-4 text-amber-400" />
+            SPORT
+          </Link>
+
+          <Link href="/tickets" className="hover:text-amber-400 transition-colors flex items-center gap-1.5">
+            <Ticket className="w-4 h-4 text-amber-400" />
+            JEUX & TICKETS
+          </Link>
 
           {user?.role === "PLAYER" && (
             <>
               <Link href="/dashboard" className="hover:text-amber-400 transition-colors">
                 {t.common.dashboard}
+              </Link>
+              <Link href="/sports/my-bets" className="hover:text-amber-400 transition-colors">
+                Mes Paris
               </Link>
               <Link href="/wallet" className="hover:text-amber-400 transition-colors flex items-center gap-1.5">
                 <Wallet className="w-4 h-4 text-emerald-400" />

@@ -35,6 +35,7 @@ model User {
   auditLogs       AuditLog[]
   notifications   Notification[]
   sessions        Session[]
+  sportsBets      SportBet[]
 
   @@index([role])
   @@index([countryCode])
@@ -123,7 +124,7 @@ model LedgerEntry {
 
 model TicketType {
   id              String         @id @default(cuid())
-  slug            String         @unique // ex: 'chans-lakay-100'
+  slug            String         @unique // ex: 'chance-lakay-100'
   name            String
   description     String
   priceCents      Int            @default(10000) // 100.00 HTG
@@ -344,4 +345,39 @@ model CountryMarket {
   complianceNotes    String?
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
+}
+
+// ==========================================
+// PARIS SPORTIFS (SPORTS BETTING)
+// ==========================================
+
+model SportBet {
+  id                String       @id @default(cuid())
+  betTicketNumber   String       @unique
+  userId            String
+  sportKey          String       @default("soccer")
+  matchId           String       // ID du match The Odds API
+  leagueName        String       @default("Football")
+  homeTeam          String
+  awayTeam          String
+  commenceTime      DateTime
+  marketType        String       @default("h2h") // 1X2
+  selectedOutcome   String       // HOME (1), DRAW (X), AWAY (2)
+  selectedLabel     String       // Nom de l'équipe ou "Match Nul"
+  odds              Float        // Cote ex: 2.20
+  stakeCents        Int          // Mise en centimes
+  potentialWinCents Int          // Gain potentiel en centimes
+  currency          String       @default("HTG")
+  countryCode       String       @default("HT")
+  status            String       @default("PENDING") // PENDING, WON, LOST, CANCELLED
+  resultScore       String?      // Score final ex: "2 - 1"
+  settledAt         DateTime?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  user              User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([matchId])
 }
