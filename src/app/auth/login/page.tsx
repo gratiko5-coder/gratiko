@@ -111,30 +111,32 @@ export default function LoginPage() {
           </button>
         </form>
 
-        {/* Raccourcis Comptes Démo Sandbox */}
-        <div className="p-4 bg-gray-950/70 border border-indigo-900/40 rounded-2xl space-y-2 text-xs">
-          <p className="font-bold text-amber-300 text-[11px] uppercase tracking-wider">
-            Comptes de démonstration préconfigurés :
-          </p>
-          <div className="flex flex-col gap-1.5">
-            <button
-              type="button"
-              onClick={() => handleDemoFill("joueur@gratiko.demo", "GratikoPlayer2026!")}
-              className="text-left px-2.5 py-1.5 rounded-lg bg-gray-900 hover:bg-gray-800 text-gray-300 flex justify-between items-center transition-colors"
-            >
-              <span>🎮 <strong>Joueur Démo</strong> (Solde: 1 000 HTG)</span>
-              <span className="text-[10px] text-amber-400 font-mono">Cliquer</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => handleDemoFill("superadmin@gratiko.demo", "GratikoAdmin2026!")}
-              className="text-left px-2.5 py-1.5 rounded-lg bg-gray-900 hover:bg-gray-800 text-gray-300 flex justify-between items-center transition-colors"
-            >
-              <span>🛡️ <strong>Super-Admin</strong> (Accès global & grand livre)</span>
-              <span className="text-[10px] text-amber-400 font-mono">Cliquer</span>
-            </button>
+        {/* Raccourcis Comptes Démo Sandbox (Uniquement en mode DEMO) */}
+        {process.env.NEXT_PUBLIC_APP_MODE !== "PRODUCTION" && (
+          <div className="p-4 bg-gray-950/70 border border-indigo-900/40 rounded-2xl space-y-2 text-xs">
+            <p className="font-bold text-amber-300 text-[11px] uppercase tracking-wider">
+              Comptes de démonstration préconfigurés :
+            </p>
+            <div className="flex flex-col gap-1.5">
+              <button
+                type="button"
+                onClick={() => handleDemoFill("joueur@gratiko.demo", "GratikoPlayer2026!")}
+                className="text-left px-2.5 py-1.5 rounded-lg bg-gray-900 hover:bg-gray-800 text-gray-300 flex justify-between items-center transition-colors"
+              >
+                <span>🎮 <strong>Joueur Démo</strong> (Solde: 1 000 HTG)</span>
+                <span className="text-[10px] text-amber-400 font-mono">Cliquer</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleDemoFill("superadmin@gratiko.demo", "GratikoAdmin2026!")}
+                className="text-left px-2.5 py-1.5 rounded-lg bg-gray-900 hover:bg-gray-800 text-gray-300 flex justify-between items-center transition-colors"
+              >
+                <span>🛡️ <strong>Super-Admin</strong> (Accès global & grand livre)</span>
+                <span className="text-[10px] text-amber-400 font-mono">Cliquer</span>
+              </button>
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="text-center pt-2">
           <p className="text-xs text-gray-400">

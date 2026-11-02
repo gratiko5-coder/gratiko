@@ -38,6 +38,9 @@ export async function POST(req: NextRequest) {
     // Initialisation du marché et compte
     await ensureStandardChartOfAccounts(countryCode, "HTG");
 
+    const isProd = process.env.APP_MODE === "PRODUCTION";
+    const initialBonusCents = isProd ? 0 : 50000;
+
     const user = await prisma.user.create({
       data: {
         email,
@@ -49,10 +52,10 @@ export async function POST(req: NextRequest) {
         currency: "HTG",
         preferredLocale,
         isEmailVerified: false,
-        isDemoAccount: true, // Par défaut en mode démo sécurisé
+        isDemoAccount: !isProd,
         wallet: {
           create: {
-            balanceCents: 50000, // 500 HTG offerts en mode démo pour tester immédiatement
+            balanceCents: initialBonusCents,
             currency: "HTG",
           },
         },
@@ -60,21 +63,23 @@ export async function POST(req: NextRequest) {
       include: { wallet: true },
     });
 
-    // Enregistrer le crédit démo de bienvenue au grand livre
-    await recordBalancedTransaction({
-      idempotencyKey: `WELCOME_BONUS_${user.id}`,
-      reference: `BONUS-${user.id.slice(-6)}`,
-      description: "Bonus de bienvenue de démonstration (Crédits fictifs)",
-      transactionType: "RECHARGE_DEPOSIT",
-      amountCents: 50000,
-      currency: "HTG",
-      countryCode,
-      relatedEntityId: user.id,
-      entries: [
-        { accountCode: ACCOUNT_CODES.CASH_VAULT, entryType: "DEBIT", amountCents: 50000 },
-        { accountCode: ACCOUNT_CODES.PLAYER_BALANCES, entryType: "CREDIT", amountCents: 50000 },
-      ],
-    });
+    // Enregistrer le bonus de bienvenue démo uniquement hors production
+    if (!isProd && initialBonusCents > 0) {
+      await recordBalancedTransaction({
+        idempotencyKey: `WELCOME_BONUS_${user.id}`,
+        reference: `BONUS-${user.id.slice(-6)}`,
+        description: "Bonus de bienvenue de démonstration (Crédits fictifs)",
+        transactionType: "RECHARGE_DEPOSIT",
+        amountCents: initialBonusCents,
+        currency: "HTG",
+        countryCode,
+        relatedEntityId: user.id,
+        entries: [
+          { accountCode: ACCOUNT_CODES.CASH_VAULT, entryType: "DEBIT", amountCents: initialBonusCents },
+          { accountCode: ACCOUNT_CODES.PLAYER_BALANCES, entryType: "CREDIT", amountCents: initialBonusCents },
+        ],
+      });
+    }
 
     const token = await createSessionToken({
       userId: user.id,

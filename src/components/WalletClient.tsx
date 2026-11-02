@@ -318,7 +318,12 @@ export default function WalletClient({
             <div className="space-y-3 text-xs text-gray-400 leading-relaxed">
               <div className="p-3 bg-gray-950 rounded-xl border border-gray-800 space-y-1">
                 <span className="font-bold text-white">1. Effectuez votre dépôt :</span>
-                <p>MonCash / NatCash démo officiel : <strong className="text-amber-400 font-mono">+509 37 00 00 00</strong></p>
+                <p>
+                  Transférez vos fonds vers notre compte officiel <strong>MonCash</strong> ou <strong>NatCash</strong> agréé GRATIKO.
+                </p>
+                <p className="text-[11px] text-amber-300 font-mono">
+                  Numéro officiel des dépôts : <strong>+509 37 00 00 00</strong>
+                </p>
               </div>
               <div className="p-3 bg-gray-950 rounded-xl border border-gray-800 space-y-1">
                 <span className="font-bold text-white">2. Soumettez le formulaire :</span>

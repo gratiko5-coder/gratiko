@@ -9,6 +9,7 @@
     "start": "next start",
     "test": "vitest run",
     "seed": "tsx src/scripts/seed.ts",
+    "seed:prod": "tsx src/scripts/seed-production.ts",
     "db:push": "prisma db push",
     "db:generate": "prisma generate",
     "postinstall": "prisma generate",

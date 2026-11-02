@@ -44,7 +44,7 @@ export default async function RootLayout({
   return (
     <html lang={localeCookie} className="dark">
       <body className="bg-gray-950 text-gray-100 flex flex-col min-h-screen antialiased selection:bg-amber-500 selection:text-gray-950 overflow-x-hidden w-full max-w-full">
-        <DemoBanner notice={t.common.demoNotice} />
+        {process.env.APP_MODE !== "PRODUCTION" && <DemoBanner notice={t.common.demoNotice} />}
         <Header user={user} t={t} currentLocale={localeCookie} />
         <main className="flex-1 w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 overflow-x-hidden">
           {children}

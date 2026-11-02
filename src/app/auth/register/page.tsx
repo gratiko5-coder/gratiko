@@ -54,7 +54,9 @@ export default function RegisterPage() {
           </Link>
           <h1 className="text-2xl font-black text-white">Rejoindre GRATIKO</h1>
           <p className="text-xs text-gray-400">
-            Créez votre compte joueur et recevez automatiquement 500 HTG de crédits démo !
+            {process.env.NEXT_PUBLIC_APP_MODE === "PRODUCTION"
+              ? "Créez votre compte joueur sécurisé et découvrez vos gains instantanés !"
+              : "Créez votre compte joueur et recevez automatiquement 500 HTG de crédits démo !"}
           </p>
         </div>
 

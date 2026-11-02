@@ -97,7 +97,11 @@ export default function Footer({ t }: { t: Translations }) {
             </p>
             <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl text-amber-300 text-[11px] flex gap-2">
               <AlertCircle className="w-4 h-4 shrink-0 text-amber-400" />
-              <span>Environnement de démonstration. Réservé aux personnes majeures selon la législation en vigueur.</span>
+              <span>
+                {process.env.NEXT_PUBLIC_APP_MODE === "PRODUCTION"
+                  ? "Jeu responsable : Loterie sécurisée et certifiée. Réservé strictement aux personnes majeures (+18 ans). Jouez avec modération."
+                  : "Environnement de démonstration. Réservé aux personnes majeures selon la législation en vigueur."}
+              </span>
             </div>
           </div>
         </div>
