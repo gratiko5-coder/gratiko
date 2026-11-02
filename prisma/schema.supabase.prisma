@@ -1,0 +1,347 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ==========================================
+// RÔLES ET UTILISATEURS
+// ==========================================
+
+model User {
+  id              String         @id @default(cuid())
+  email           String         @unique
+  phone           String?        @unique
+  passwordHash    String
+  fullName        String
+  role            String         @default("PLAYER") // SUPER_ADMIN, COUNTRY_ADMIN, VERIFIER, AUDITOR, PLAYER
+  countryCode     String         @default("HT")
+  currency        String         @default("HTG")
+  preferredLocale String         @default("fr") // fr, ht, en, es
+  status          String         @default("ACTIVE") // ACTIVE, SUSPENDED, DEACTIVATED
+  isEmailVerified Boolean        @default(false)
+  isDemoAccount   Boolean        @default(false)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  wallet          Wallet?
+  tickets         Ticket[]
+  rechargeRequests RechargeRequest[]
+  withdrawalRequests WithdrawalRequest[]
+  auditLogs       AuditLog[]
+  notifications   Notification[]
+  sessions        Session[]
+
+  @@index([role])
+  @@index([countryCode])
+  @@index([status])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  token        String   @unique
+  expiresAt    DateTime
+  ipAddress    String?
+  userAgent    String?
+  createdAt    DateTime @default(now())
+
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ==========================================
+// PORTEFEUILLE ET COMPTABILITÉ DOUBLE ENTRÉE
+// ==========================================
+
+model Wallet {
+  id              String        @id @default(cuid())
+  userId          String        @unique
+  balanceCents    Int           @default(0) // Stocké en centimes / plus petite unité entière (100 HTG = 10000 cents)
+  pendingInCents  Int           @default(0) // En attente de vérification (recharges)
+  pendingOutCents Int           @default(0) // Bloqué pour retrait en cours
+  currency        String        @default("HTG")
+  updatedAt       DateTime      @updatedAt
+
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Grand livre comptable (General Ledger) pour traçabilité intégrale
+model LedgerAccount {
+  id          String         @id @default(cuid())
+  code        String         @unique // ex: 1010-CASH-VAULT, 2010-PLAYER-BALANCES, 4010-GROSS-SALES, 5010-RESERVE-FUND, 5020-PRIZE-POOL, 7010-OPERATOR-COMMISSION
+  name        String
+  category    String         // ASSET, LIABILITY, EQUITY, REVENUE, EXPENSE
+  currency    String         @default("HTG")
+  countryCode String         @default("HT")
+  createdAt   DateTime       @default(now())
+
+  entries     LedgerEntry[]
+}
+
+model LedgerTransaction {
+  id             String        @id @default(cuid())
+  idempotencyKey String        @unique
+  reference      String        @unique
+  description    String
+  transactionType String       // TICKET_PURCHASE, PRIZE_PAYOUT, RECHARGE_DEPOSIT, WITHDRAWAL_PAYOUT, COMMISSION_ALLOCATION, RESERVE_TRANSFER
+  amountCents    Int
+  currency       String        @default("HTG")
+  countryCode    String        @default("HT")
+  relatedEntityId String?      // ticketId, rechargeId, withdrawalId
+  createdAt      DateTime      @default(now())
+
+  entries        LedgerEntry[]
+
+  @@index([transactionType])
+  @@index([countryCode])
+  @@index([createdAt])
+}
+
+model LedgerEntry {
+  id             String            @id @default(cuid())
+  transactionId  String
+  accountId      String
+  entryType      String            // DEBIT, CREDIT
+  amountCents    Int
+  currency       String            @default("HTG")
+  createdAt      DateTime          @default(now())
+
+  transaction    LedgerTransaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  account        LedgerAccount     @relation(fields: [accountId], references: [id])
+
+  @@index([transactionId])
+  @@index([accountId])
+}
+
+// ==========================================
+// TICKETS, LOTS ET MOTEUR DE JEU
+// ==========================================
+
+model TicketType {
+  id              String         @id @default(cuid())
+  slug            String         @unique // ex: 'chans-lakay-100'
+  name            String
+  description     String
+  priceCents      Int            @default(10000) // 100.00 HTG
+  currency        String         @default("HTG")
+  countryCode     String         @default("HT")
+  isActive        Boolean        @default(true)
+  rulesText       String
+  visualTheme     String         @default("gold-amber") // theme identifier
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  batches         TicketBatch[]
+  tickets         Ticket[]
+}
+
+model TicketBatch {
+  id                 String       @id @default(cuid())
+  batchNumber        String       @unique
+  ticketTypeId       String
+  totalTickets       Int          // Nombre de tickets dans ce lot (ex: 1000)
+  ticketsSold        Int          @default(0)
+  totalCostCents     Int          // totalTickets * priceCents
+  maxPrizeBudgetCents Int         // Total théorique des gains configurés
+  currency           String       @default("HTG")
+  countryCode        String       @default("HT")
+  status             String       @default("ACTIVE") // PENDING, ACTIVE, EXHAUSTED, SUSPENDED
+  configSnapshotJson String       // Snapshot immuable JSON des tiers et probabilités
+  createdAt          DateTime     @default(now())
+
+  ticketType         TicketType   @relation(fields: [ticketTypeId], references: [id])
+  prizeTiers         PrizeTierConfig[]
+  tickets            Ticket[]
+
+  @@index([status])
+}
+
+model PrizeTierConfig {
+  id             String       @id @default(cuid())
+  batchId        String
+  tierName       String       // ex: 'PERDANT', 'GAIN_100', 'GAIN_500', 'JACKPOT_5000'
+  prizeAmountCents Int        // Montant du gain
+  probability    Float        // e.g. 0.65 pour 65%, 0.20 pour 20%
+  allocatedCount Int          // Nombre exact de tickets gagnants dans ce lot pour intégrité statistique
+  remainingCount Int          // Nombre encore non tiré
+  displayLabel   String       // ex: "100 HTG" ou "Perdu"
+  symbolsPattern String       // JSON des symboles à afficher (ex: ["7", "7", "7"] ou ["STAR", "COIN", "LEMON"])
+
+  batch          TicketBatch  @relation(fields: [batchId], references: [id], onDelete: Cascade)
+
+  @@index([batchId])
+}
+
+model Ticket {
+  id             String       @id @default(cuid())
+  ticketNumber   String       @unique
+  userId         String
+  ticketTypeId   String
+  batchId        String
+  priceCents     Int
+  currency       String       @default("HTG")
+  countryCode    String       @default("HT")
+  
+  // Résultat immuable scellé dès l'achat
+  isWinner       Boolean
+  prizeAmountCents Int        @default(0)
+  tierName       String
+  symbolsPattern String       // Format JSON array
+  
+  // Cycle de vie
+  status         String       @default("PURCHASED") // PURCHASED, SCRATCHED, CLAIMED
+  purchasedAt    DateTime     @default(now())
+  scratchedAt    DateTime?
+  claimedAt      DateTime?
+
+  // Idempotence d'achat et sécurité
+  purchaseIdempotencyKey String? @unique
+
+  user           User         @relation(fields: [userId], references: [id])
+  ticketType     TicketType   @relation(fields: [ticketTypeId], references: [id])
+  batch          TicketBatch  @relation(fields: [batchId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@index([purchasedAt])
+}
+
+// ==========================================
+// RECHARGES MANUELLES ET RETRAITS
+// ==========================================
+
+model RechargeRequest {
+  id              String       @id @default(cuid())
+  reference       String       @unique
+  userId          String
+  amountCents     Int
+  currency        String       @default("HTG")
+  countryCode     String       @default("HT")
+  paymentMethod   String       // MONCASH, NATCASH, BANK_TRANSFER, CASH_AGENT
+  senderIdentifier String      // Numéro de téléphone ou compte émetteur
+  transactionProof String?     // Numéro de transaction ou preuve
+  status          String       @default("PENDING") // PENDING, UNDER_REVIEW, APPROVED, REJECTED, CANCELLED
+  adminNotes      String?
+  reviewedByUserId String?
+  reviewedAt      DateTime?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  user            User         @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+}
+
+model WithdrawalRequest {
+  id              String       @id @default(cuid())
+  reference       String       @unique
+  userId          String
+  amountCents     Int
+  currency        String       @default("HTG")
+  countryCode     String       @default("HT")
+  payoutMethod    String       // MONCASH, NATCASH, BANK_TRANSFER
+  destinationAccount String   // Numéro ou compte de réception
+  status          String       @default("REQUESTED") // REQUESTED, APPROVED, PROCESSING, PAID, REJECTED, CANCELLED
+  adminNotes      String?
+  payoutReference String?      // Référence du virement bancaire / MonCash réel exécuté
+  reviewedByUserId String?
+  paidAt          DateTime?
+  reviewedAt      DateTime?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  user            User         @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+}
+
+// ==========================================
+// RAPPORTS FINANCIERS QUOTIDIENS ET RÉSERVES
+// ==========================================
+
+model DailyFinancialReport {
+  id                   String   @id @default(cuid())
+  reportDate           String   // Format YYYY-MM-DD
+  countryCode          String   @default("HT")
+  currency             String   @default("HTG")
+  
+  grossSalesCents      Int      @default(0) // Total ventes brutes
+  ticketsCount         Int      @default(0) // Quantité de tickets
+  operatorCommCents    Int      @default(0) // 20% cible
+  gameAllocationCents  Int      @default(0) // 80% cible
+  dailyReserveCents    Int      @default(0) // 40% de l'allocation
+  dailyPrizeBudgetCents Int     @default(0) // 60% restant
+  prizesAwardedCents   Int      @default(0) // Gains réellement attribués
+  playerObligationsCents Int    @default(0) // Sommes dues aux joueurs à date
+  cashInVaultCents     Int      @default(0) // Dépôts réels en coffre/banque
+  isBalanced           Boolean  @default(true)
+  discrepancyCents     Int      @default(0)
+  createdAt            DateTime @default(now())
+
+  @@unique([reportDate, countryCode, currency])
+}
+
+// ==========================================
+// AUDIT LOG ET SÉCURITÉ
+// ==========================================
+
+model AuditLog {
+  id          String    @id @default(cuid())
+  userId      String?
+  action      String    // LOGIN, LOGOUT, TICKET_PURCHASE, RECHARGE_APPROVED, WITHDRAWAL_PAID, PROBABILITY_CHANGED, COUNTRY_SUSPENDED
+  resource    String
+  resourceId  String?
+  details     String?   // JSON payload des changements
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime  @default(now())
+
+  user        User?     @relation(fields: [userId], references: [id])
+
+  @@index([action])
+  @@index([createdAt])
+}
+
+model Notification {
+  id          String    @id @default(cuid())
+  userId      String
+  title       String
+  message     String
+  type        String    // SUCCESS, INFO, WARNING, ERROR
+  isRead      Boolean   @default(false)
+  link        String?
+  createdAt   DateTime  @default(now())
+
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+}
+
+// ==========================================
+// EXPANSION INTERNATIONALE ET PAYS
+// ==========================================
+
+model CountryMarket {
+  code               String   @id // 'HT', 'DO', 'SN', 'CI', etc.
+  name               String
+  currency           String   // 'HTG', 'DOP', 'XOF'
+  timezone           String   @default("America/Port-au-Prince")
+  allowedLocales     String   // JSON array: ["ht", "fr"]
+  isMarketActive     Boolean  @default(true)
+  minRechargeCents   Int      @default(10000) // 100 HTG
+  maxRechargeCents   Int      @default(10000000) // 100 000 HTG
+  minWithdrawalCents Int      @default(20000) // 200 HTG
+  maxWithdrawalCents Int      @default(5000000) // 50 000 HTG
+  operatorCommissionRatio Float @default(0.20)
+  gameAllocationRatio     Float @default(0.80)
+  dailyReserveRatio       Float @default(0.40)
+  complianceNotes    String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
