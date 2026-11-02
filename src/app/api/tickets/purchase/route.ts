@@ -15,6 +15,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Authentification requise." }, { status: 401 });
     }
 
+    if (user.role !== "PLAYER") {
+      return NextResponse.json({ error: "Les comptes administratifs sont strictement interdits de jeu pour garantir l'intégrité de la plateforme." }, { status: 403 });
+    }
+
     const body = await req.json();
     const parsed = purchaseSchema.safeParse(body);
     if (!parsed.success) {

@@ -31,7 +31,11 @@ export default function LoginPage() {
         return;
       }
 
-      router.push("/dashboard");
+      if (data.user?.role !== "PLAYER") {
+        router.push("/admin");
+      } else {
+        router.push("/dashboard");
+      }
       router.refresh();
     } catch {
       setError("Erreur de connexion au serveur");

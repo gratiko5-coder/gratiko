@@ -12,6 +12,11 @@ export default async function WalletPage() {
     redirect("/auth/login");
   }
 
+  // Séparation stricte : les comptes administrateurs gèrent la trésorerie et sont redirigés vers /admin
+  if (user.role !== "PLAYER") {
+    redirect("/admin");
+  }
+
   const cookieStore = await cookies();
   const locale = (cookieStore.get("NEXT_LOCALE")?.value as Locale) || "fr";
   const t = getDictionary(locale);

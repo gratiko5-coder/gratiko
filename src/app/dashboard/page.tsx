@@ -23,6 +23,11 @@ export default async function DashboardPage() {
     redirect("/auth/login");
   }
 
+  // Redirection des administrateurs vers la console d'administration
+  if (user.role !== "PLAYER") {
+    redirect("/admin");
+  }
+
   const cookieStore = await cookies();
   const locale = (cookieStore.get("NEXT_LOCALE")?.value as Locale) || "fr";
   const t = getDictionary(locale);

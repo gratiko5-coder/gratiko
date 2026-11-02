@@ -50,11 +50,14 @@ export default function Header({ user, t, currentLocale }: HeaderProps) {
 
         {/* Navigation Desktop */}
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-gray-300">
-          <Link href="/tickets" className="hover:text-amber-400 transition-colors flex items-center gap-1.5">
-            <Ticket className="w-4 h-4 text-amber-400" />
-            {t.dashboard.buyTicketBtn}
-          </Link>
-          {user && (
+          {(!user || user.role === "PLAYER") && (
+            <Link href="/tickets" className="hover:text-amber-400 transition-colors flex items-center gap-1.5">
+              <Ticket className="w-4 h-4 text-amber-400" />
+              {t.dashboard.buyTicketBtn}
+            </Link>
+          )}
+
+          {user?.role === "PLAYER" && (
             <>
               <Link href="/dashboard" className="hover:text-amber-400 transition-colors">
                 {t.common.dashboard}
@@ -65,15 +68,17 @@ export default function Header({ user, t, currentLocale }: HeaderProps) {
               </Link>
             </>
           )}
-          {(user?.role === "SUPER_ADMIN" || user?.role === "COUNTRY_ADMIN") && (
+
+          {user && user.role !== "PLAYER" && (
             <Link
               href="/admin"
-              className="text-amber-400 hover:text-amber-300 transition-colors flex items-center gap-1.5 px-3 py-1 bg-amber-500/10 rounded-lg border border-amber-500/20"
+              className="text-amber-400 hover:text-amber-300 transition-colors flex items-center gap-1.5 px-3 py-1.5 bg-amber-500/15 rounded-xl border border-amber-500/30 font-bold"
             >
               <Shield className="w-4 h-4" />
               {t.common.adminDashboard}
             </Link>
           )}
+
           <Link href="/legal/rules" className="hover:text-gray-100 transition-colors">
             Règles & Cotes
           </Link>
@@ -101,17 +106,26 @@ export default function Header({ user, t, currentLocale }: HeaderProps) {
 
           {user ? (
             <div className="flex items-center gap-3">
-              {/* Solde portefeuille */}
-              <Link
-                href="/wallet"
-                className="hidden sm:flex items-center gap-2 bg-gradient-to-r from-indigo-950 to-gray-900 border border-indigo-500/30 rounded-xl px-3 py-1.5 shadow-sm hover:border-amber-500/40 transition-colors"
-              >
-                <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-xs text-gray-400">Solde :</span>
-                <span className="text-sm font-bold text-amber-400">
-                  {formatCurrency(user.wallet?.balanceCents || 0, user.wallet?.currency || "HTG", currentLocale)}
-                </span>
-              </Link>
+              {/* Badge Administrateur ou Solde joueur */}
+              {user.role === "PLAYER" ? (
+                <Link
+                  href="/wallet"
+                  className="hidden sm:flex items-center gap-2 bg-gradient-to-r from-indigo-950 to-gray-900 border border-indigo-500/30 rounded-xl px-3 py-1.5 shadow-sm hover:border-amber-500/40 transition-colors"
+                >
+                  <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="text-xs text-gray-400">Solde :</span>
+                  <span className="text-sm font-bold text-amber-400">
+                    {formatCurrency(user.wallet?.balanceCents || 0, user.wallet?.currency || "HTG", currentLocale)}
+                  </span>
+                </Link>
+              ) : (
+                <div className="hidden sm:flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 rounded-xl px-3 py-1.5">
+                  <Shield className="w-4 h-4 text-amber-400" />
+                  <span className="text-xs font-bold text-amber-300 uppercase tracking-wider">
+                    {user.role.replace("_", " ")}
+                  </span>
+                </div>
+              )}
 
               {/* Bouton Déconnexion */}
               <button
@@ -152,14 +166,16 @@ export default function Header({ user, t, currentLocale }: HeaderProps) {
       {/* Menu Mobile déroulant */}
       {mobileMenuOpen && (
         <div className="md:hidden bg-gray-950 border-b border-gray-800 px-4 py-4 space-y-3">
-          <Link
-            href="/tickets"
-            onClick={() => setMobileMenuOpen(false)}
-            className="block text-sm font-medium text-amber-400 py-1"
-          >
-            {t.dashboard.buyTicketBtn}
-          </Link>
-          {user && (
+          {(!user || user.role === "PLAYER") && (
+            <Link
+              href="/tickets"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block text-sm font-medium text-amber-400 py-1"
+            >
+              {t.dashboard.buyTicketBtn}
+            </Link>
+          )}
+          {user?.role === "PLAYER" && (
             <>
               <Link
                 href="/dashboard"
@@ -173,18 +189,17 @@ export default function Header({ user, t, currentLocale }: HeaderProps) {
                 onClick={() => setMobileMenuOpen(false)}
                 className="block text-sm font-medium text-emerald-400 py-1"
               >
-                {t.dashboard.walletTitle} (
-                {formatCurrency(user.wallet?.balanceCents || 0, user.wallet?.currency || "HTG", currentLocale)})
+                {t.dashboard.walletTitle} ({formatCurrency(user.wallet?.balanceCents || 0, user.wallet?.currency || "HTG", currentLocale)})
               </Link>
             </>
           )}
-          {(user?.role === "SUPER_ADMIN" || user?.role === "COUNTRY_ADMIN") && (
+          {user && user.role !== "PLAYER" && (
             <Link
               href="/admin"
               onClick={() => setMobileMenuOpen(false)}
-              className="block text-sm font-medium text-amber-400 py-1"
+              className="block text-sm font-bold text-amber-400 py-1"
             >
-              {t.common.adminDashboard}
+              🛡️ {t.common.adminDashboard}
             </Link>
           )}
           <Link

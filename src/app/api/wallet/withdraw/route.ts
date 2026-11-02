@@ -16,6 +16,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Authentification requise." }, { status: 401 });
     }
 
+    if (user.role !== "PLAYER") {
+      return NextResponse.json({ error: "Les administrateurs ne possèdent pas de portefeuille joueur et ne peuvent pas effectuer de retraits." }, { status: 403 });
+    }
+
     const body = await req.json();
     const parsed = withdrawSchema.safeParse(body);
     if (!parsed.success) {
