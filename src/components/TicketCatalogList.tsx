@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { formatCurrency, Translations } from "@/lib/i18n";
 import { Trophy, ShieldAlert, ArrowRight, Flame } from "lucide-react";
+import { triggerWalletSync, subscribeWalletSync } from "@/lib/wallet-sync";
 
 interface TicketTypeItem {
   id: string;
@@ -42,8 +43,46 @@ export default function TicketCatalogList({
   locale: string;
 }) {
   const router = useRouter();
+  const [currentBalance, setCurrentBalance] = useState<number>(userBalanceCents);
   const [buyingId, setBuyingId] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  // Synchroniser le solde en direct
+  useEffect(() => {
+    setCurrentBalance(userBalanceCents);
+  }, [userBalanceCents]);
+
+  useEffect(() => {
+    if (!isLoggedIn) return;
+
+    // Récupérer le solde réel au chargement de la page
+    const fetchBalance = async () => {
+      try {
+        const res = await fetch("/api/wallet/balance", { cache: "no-store" });
+        if (res.ok) {
+          const data = await res.json();
+          if (typeof data.balanceCents === "number") {
+            setCurrentBalance(data.balanceCents);
+            triggerWalletSync(data.balanceCents);
+          }
+        }
+      } catch {
+        // Ignorer
+      }
+    };
+
+    fetchBalance();
+
+    const unsubscribe = subscribeWalletSync((newBal) => {
+      if (typeof newBal === "number") {
+        setCurrentBalance(newBal);
+      } else {
+        fetchBalance();
+      }
+    });
+
+    return () => unsubscribe();
+  }, [isLoggedIn]);
 
   const handleBuy = async (ticketTypeId: string, priceCents: number) => {
     if (!isLoggedIn) {
@@ -51,7 +90,7 @@ export default function TicketCatalogList({
       return;
     }
 
-    if (userBalanceCents < priceCents) {
+    if (currentBalance < priceCents) {
       setErrorMsg(t.tickets.insufficientFunds);
       return;
     }
@@ -72,8 +111,17 @@ export default function TicketCatalogList({
       const data = await res.json();
       if (!res.ok) {
         setErrorMsg(data.error || "Erreur lors de l'achat.");
+        // Si le solde était insuffisant côté serveur, rafraîchir immédiatement le solde
+        triggerWalletSync();
         setBuyingId(null);
         return;
+      }
+
+      // Notifier immédiatement toute l'application du nouveau solde
+      if (typeof data.newBalanceCents === "number") {
+        triggerWalletSync(data.newBalanceCents);
+      } else {
+        triggerWalletSync();
       }
 
       // Rediriger vers l'interface de grattage du ticket acheté

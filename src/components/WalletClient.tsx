@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { formatCurrency, Translations } from "@/lib/i18n";
+import { triggerWalletSync, subscribeWalletSync } from "@/lib/wallet-sync";
 import {
   Wallet,
   ArrowDownLeft,
@@ -36,7 +37,41 @@ export default function WalletClient({
   locale,
 }: WalletClientProps) {
   const router = useRouter();
+  const [currentWallet, setCurrentWallet] = useState(wallet);
   const [activeTab, setActiveTab] = useState<"recharge" | "withdraw" | "history">("recharge");
+
+  useEffect(() => {
+    setCurrentWallet(wallet);
+  }, [wallet]);
+
+  useEffect(() => {
+    const fetchBalance = async () => {
+      try {
+        const res = await fetch("/api/wallet/balance", { cache: "no-store" });
+        if (res.ok) {
+          const data = await res.json();
+          setCurrentWallet((prev) => ({
+            ...prev,
+            balanceCents: data.balanceCents,
+            pendingInCents: data.pendingInCents,
+            pendingOutCents: data.pendingOutCents,
+          }));
+        }
+      } catch {
+        // Ignorer
+      }
+    };
+
+    const unsubscribe = subscribeWalletSync((newBal) => {
+      if (typeof newBal === "number") {
+        setCurrentWallet((prev) => ({ ...prev, balanceCents: newBal }));
+      } else {
+        fetchBalance();
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   // Formulaire Recharge
   const [rechargeAmount, setRechargeAmount] = useState("500");
@@ -135,7 +170,7 @@ export default function WalletClient({
             <Wallet className="w-4 h-4 text-emerald-400" />
           </div>
           <div className="text-3xl font-black text-white">
-            {formatCurrency(wallet.balanceCents, wallet.currency, locale)}
+            {formatCurrency(currentWallet.balanceCents, currentWallet.currency, locale)}
           </div>
           <p className="text-[11px] text-emerald-400 font-medium flex items-center gap-1 pt-1">
             <CheckCircle className="w-3.5 h-3.5" /> Immédiatement utilisable pour jouer
@@ -148,7 +183,7 @@ export default function WalletClient({
             <ArrowDownLeft className="w-4 h-4 text-indigo-400" />
           </div>
           <div className="text-3xl font-black text-indigo-300">
-            {formatCurrency(wallet.pendingInCents, wallet.currency, locale)}
+            {formatCurrency(currentWallet.pendingInCents, currentWallet.currency, locale)}
           </div>
           <p className="text-[11px] text-gray-400 pt-1">Recharges manuelles soumises</p>
         </div>
@@ -159,7 +194,7 @@ export default function WalletClient({
             <ArrowUpRight className="w-4 h-4 text-orange-400" />
           </div>
           <div className="text-3xl font-black text-orange-300">
-            {formatCurrency(wallet.pendingOutCents, wallet.currency, locale)}
+            {formatCurrency(currentWallet.pendingOutCents, currentWallet.currency, locale)}
           </div>
           <p className="text-[11px] text-gray-400 pt-1">Fonds bloqués en cours de paiement</p>
         </div>
@@ -368,7 +403,7 @@ export default function WalletClient({
                 onChange={(e) => setWithdrawAmount(e.target.value)}
                 className="w-full px-4 py-2.5 bg-gray-950 border border-gray-800 rounded-xl text-sm text-white focus:outline-none focus:border-amber-500"
               />
-              <span className="text-[11px] text-gray-500">Minimum: 200 HTG. Solde dispo: {formatCurrency(wallet.balanceCents, wallet.currency, locale)}</span>
+              <span className="text-[11px] text-gray-500">Minimum: 200 HTG. Solde dispo: {formatCurrency(currentWallet.balanceCents, currentWallet.currency, locale)}</span>
             </div>
 
             <div className="space-y-1">

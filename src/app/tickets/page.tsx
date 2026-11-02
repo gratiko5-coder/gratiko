@@ -5,6 +5,9 @@ import { prisma } from "@/lib/prisma";
 import { getDictionary, Locale } from "@/lib/i18n";
 import TicketCatalogList from "@/components/TicketCatalogList";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function TicketsPage() {
   const user = await getCurrentUser();
   const cookieStore = await cookies();

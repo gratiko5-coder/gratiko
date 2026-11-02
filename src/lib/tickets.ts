@@ -87,7 +87,7 @@ export async function purchaseTicket(params: {
     });
 
     // 5. Débiter immédiatement le prix du ticket du portefeuille du joueur
-    await tx.wallet.update({
+    const updatedWallet = await tx.wallet.update({
       where: { userId: params.userId },
       data: {
         balanceCents: { decrement: ticketType.priceCents },
@@ -128,7 +128,10 @@ export async function purchaseTicket(params: {
       },
     });
 
-    return newTicket;
+    return {
+      ...newTicket,
+      remainingBalanceCents: updatedWallet.balanceCents,
+    };
   }).then(async (ticket) => {
     // Écritures comptables double entrée pour la vente du ticket et répartition financière
     const split = calculateTicketFinancialSplit(ticket.priceCents);
@@ -203,13 +206,15 @@ export async function revealAndClaimTicket(params: {
     });
 
     // Si gagnant, créditer automatiquement le portefeuille du joueur
+    let remainingBalanceCents: number | undefined;
     if (ticket.isWinner && ticket.prizeAmountCents > 0) {
-      await tx.wallet.update({
+      const updatedWallet = await tx.wallet.update({
         where: { userId: params.userId },
         data: {
           balanceCents: { increment: ticket.prizeAmountCents },
         },
       });
+      remainingBalanceCents = updatedWallet.balanceCents;
 
       await tx.notification.create({
         data: {
@@ -221,7 +226,10 @@ export async function revealAndClaimTicket(params: {
       });
     }
 
-    return updated;
+    return {
+      ...updated,
+      remainingBalanceCents,
+    };
   }).then(async (ticket) => {
     // Si gagnant, enregistrer l'écriture comptable du paiement de lot
     if (ticket.isWinner && ticket.prizeAmountCents > 0) {

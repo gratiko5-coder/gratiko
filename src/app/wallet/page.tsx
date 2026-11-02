@@ -6,6 +6,9 @@ import { prisma } from "@/lib/prisma";
 import { getDictionary, Locale } from "@/lib/i18n";
 import WalletClient from "@/components/WalletClient";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function WalletPage() {
   const user = await getCurrentUser();
   if (!user) {

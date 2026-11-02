@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Translations, formatCurrency, Locale } from "@/lib/i18n";
 import { Wallet, LogOut, Shield, Ticket, Menu, X, Globe, User, Smartphone } from "lucide-react";
+import { subscribeWalletSync } from "@/lib/wallet-sync";
 
 interface HeaderProps {
   user: {
@@ -24,6 +25,65 @@ interface HeaderProps {
 export default function Header({ user, t, currentLocale }: HeaderProps) {
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [balanceCents, setBalanceCents] = useState(user?.wallet?.balanceCents ?? 0);
+  const currency = user?.wallet?.currency || "HTG";
+
+  const fetchFreshBalance = useCallback(async () => {
+    if (!user || user.role !== "PLAYER") return;
+    try {
+      const res = await fetch("/api/wallet/balance", { cache: "no-store" });
+      if (res.ok) {
+        const data = await res.json();
+        if (typeof data.balanceCents === "number") {
+          setBalanceCents(data.balanceCents);
+        }
+      }
+    } catch {
+      // Ignorer silencieusement
+    }
+  }, [user]);
+
+  // Synchronisation solde temps réel
+  useEffect(() => {
+    if (user?.wallet?.balanceCents !== undefined) {
+      setBalanceCents(user.wallet.balanceCents);
+    }
+  }, [user?.wallet?.balanceCents]);
+
+  useEffect(() => {
+    if (!user || user.role !== "PLAYER") return;
+
+    // Charger immédiatement au montage
+    fetchFreshBalance();
+
+    // Écouter les événements d'achat, de grattage et de recharge
+    const unsubscribe = subscribeWalletSync((newBal) => {
+      if (typeof newBal === "number") {
+        setBalanceCents(newBal);
+      } else {
+        fetchFreshBalance();
+      }
+    });
+
+    // Écouter le retour sur l'onglet ou l'application mobile
+    const onVisibility = () => {
+      if (document.visibilityState === "visible") {
+        fetchFreshBalance();
+      }
+    };
+    window.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener("focus", fetchFreshBalance);
+
+    // Rafraîchissement automatique léger toutes les 10 secondes
+    const interval = setInterval(fetchFreshBalance, 10000);
+
+    return () => {
+      unsubscribe();
+      window.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("focus", fetchFreshBalance);
+      clearInterval(interval);
+    };
+  }, [user, fetchFreshBalance]);
 
   const handleLocaleChange = async (newLocale: string) => {
     document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000`;
@@ -115,7 +175,7 @@ export default function Header({ user, t, currentLocale }: HeaderProps) {
                   <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
                   <span className="hidden sm:inline text-xs text-gray-400">Solde :</span>
                   <span className="text-xs sm:text-sm font-bold text-amber-400">
-                    {formatCurrency(user.wallet?.balanceCents || 0, user.wallet?.currency || "HTG", currentLocale)}
+                    {formatCurrency(balanceCents, currency, currentLocale)}
                   </span>
                 </Link>
               ) : (
@@ -223,7 +283,7 @@ export default function Header({ user, t, currentLocale }: HeaderProps) {
                     {t.dashboard.walletTitle}
                   </span>
                   <span className="text-xs font-bold bg-emerald-500/20 px-2 py-0.5 rounded border border-emerald-500/30">
-                    {formatCurrency(user.wallet?.balanceCents || 0, user.wallet?.currency || "HTG", currentLocale)}
+                    {formatCurrency(balanceCents, currency, currentLocale)}
                   </span>
                 </Link>
               </>

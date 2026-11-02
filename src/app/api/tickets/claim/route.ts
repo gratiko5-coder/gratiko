@@ -28,6 +28,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       ticket,
+      newBalanceCents: (ticket as any).remainingBalanceCents,
     });
   } catch (error: any) {
     console.error("Erreur réclamation ticket:", error);

@@ -33,6 +33,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
+      newBalanceCents: (ticket as any).remainingBalanceCents,
       ticket: {
         id: ticket.id,
         ticketNumber: ticket.ticketNumber,

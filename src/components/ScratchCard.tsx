@@ -3,6 +3,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import { formatCurrency, Translations } from "@/lib/i18n";
 import { Sparkles, Trophy, Frown, CheckCircle } from "lucide-react";
+import { triggerWalletSync } from "@/lib/wallet-sync";
 
 interface ScratchCardProps {
   ticket: {
@@ -157,6 +158,11 @@ export default function ScratchCard({ ticket, t, locale, onRevealed }: ScratchCa
       const data = await res.json();
       if (res.ok) {
         setClaimStatus("claimed");
+        if (typeof data.newBalanceCents === "number") {
+          triggerWalletSync(data.newBalanceCents);
+        } else {
+          triggerWalletSync();
+        }
         if (onRevealed) onRevealed(data.ticket);
       }
     } catch {
