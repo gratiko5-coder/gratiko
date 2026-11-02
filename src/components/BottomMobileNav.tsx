@@ -26,8 +26,13 @@ export default function BottomMobileNav({ user }: BottomMobileNavProps) {
 
   return (
     <>
-      {/* Barre de navigation basse fixée sur mobile */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-gray-950/98 backdrop-blur-lg border-t border-gray-800 px-2 py-1.5 shadow-[0_-4px_16px_rgba(0,0,0,0.6)]">
+      {/* Barre de navigation basse fixée sur mobile avec dégagement généreux des touches virtuelles Android (||| [] <) */}
+      <nav
+        className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-gray-950/98 backdrop-blur-xl border-t border-gray-800/90 px-2 pt-2.5 shadow-[0_-8px_30px_rgba(0,0,0,0.95)]"
+        style={{
+          paddingBottom: "max(calc(env(safe-area-inset-bottom, 0px) + 26px), 48px)",
+        }}
+      >
         <div className="grid grid-cols-5 items-center justify-between text-center">
           {/* Live */}
           <Link

@@ -369,6 +369,8 @@ model SportBet {
   potentialWinCents Int          // Gain potentiel en centimes
   currency          String       @default("HTG")
   countryCode       String       @default("HT")
+  betType           String       @default("SIMPLE") // SIMPLE ou MULTIPLE
+  selectionsJson    String?      // JSON des sélections du combiné
   status            String       @default("PENDING") // PENDING, WON, LOST, CANCELLED
   resultScore       String?      // Score final ex: "2 - 1"
   settledAt         DateTime?
