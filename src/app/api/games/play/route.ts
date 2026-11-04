@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { recordBalancedTransaction, ACCOUNT_CODES, calculateTicketFinancialSplit } from "@/lib/finance";
+import { contributeToJackpots, checkAndAwardJackpot } from "@/lib/jackpots";
 import crypto from "crypto";
 
 export const dynamic = "force-dynamic";
@@ -327,9 +328,14 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // Alimentation et vérification des 3 Jackpots Progressifs Réels
+    await contributeToJackpots(betCents);
+    const jackpotCheck = await checkAndAwardJackpot(user.id, betCents);
+
     return NextResponse.json({
       success: true,
       result: gameResult,
+      jackpotWon: jackpotCheck.won ? jackpotCheck.jackpot : null,
     });
   } catch (error: any) {
     console.error("Erreur jeu instantané:", error);

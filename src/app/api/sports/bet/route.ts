@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { placeSportBet } from "@/lib/sports";
+import { contributeToJackpots, checkAndAwardJackpot } from "@/lib/jackpots";
 import { z } from "zod";
 
 export const dynamic = "force-dynamic";
@@ -61,10 +62,15 @@ export async function POST(req: NextRequest) {
       selections,
     });
 
+    // Alimentation et tirage des 3 Jackpots Progressifs
+    await contributeToJackpots(parsed.data.stakeCents);
+    const jackpotCheck = await checkAndAwardJackpot(user.id, parsed.data.stakeCents);
+
     return NextResponse.json({
       success: true,
       bet: result.bet,
       newBalanceCents: result.newBalanceCents,
+      jackpotWon: jackpotCheck.won ? jackpotCheck.jackpot : null,
     });
   } catch (error: any) {
     console.error("Erreur placement pari:", error);

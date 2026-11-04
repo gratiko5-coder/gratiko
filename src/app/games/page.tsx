@@ -92,35 +92,33 @@ const GAMES_CATALOG: GameCard[] = [
   },
 ];
 
-// Composant pour afficher les compteurs sous forme de cases de rouleaux digitaux (Modèle Image 3)
-function JackpotOdometer({ label, value, color }: { label: string; value: string; color: "silver" | "gold" | "max" }) {
-  const digits = value.padStart(6, "0").split("");
+// Composant pour afficher les compteurs sous forme de capsule néon avec rouleaux digitaux (Modèle Image 2 & 3)
+function JackpotOdometer({ label, value }: { label: string; value: number }) {
+  const str = value.toString().padStart(6, " ");
+  const chars = str.split("");
 
   return (
     <div className="flex flex-col items-center space-y-1">
-      <span
-        className={`text-[9px] sm:text-[10px] font-black uppercase tracking-wider ${
-          color === "gold" ? "text-amber-400" : color === "silver" ? "text-gray-300" : "text-amber-500"
-        }`}
-      >
+      <span className="text-[8px] sm:text-xs font-black italic tracking-wider text-white uppercase drop-shadow">
         {label}
       </span>
 
-      <div className="flex items-center gap-0.5 sm:gap-1 bg-black/80 p-1 rounded-lg border border-[#1f2d47] shadow-inner">
-        {digits.map((d, i) => (
-          <span
-            key={i}
-            className={`w-4 h-6 sm:w-5 sm:h-7 rounded flex items-center justify-center font-mono font-black text-xs sm:text-sm border ${
-              color === "gold"
-                ? "text-yellow-400 border-yellow-500/40 bg-gradient-to-b from-yellow-950/40 to-black"
-                : color === "silver"
-                ? "text-gray-200 border-gray-500/40 bg-gradient-to-b from-gray-900 to-black"
-                : "text-amber-400 border-amber-600/40 bg-gradient-to-b from-amber-950/40 to-black"
-            }`}
-          >
-            {d}
-          </span>
-        ))}
+      <div className="relative inline-flex items-center justify-center gap-0.5 sm:gap-1 bg-black/90 px-1.5 sm:px-2 py-1 rounded-full border-2 border-yellow-400 shadow-[0_0_14px_rgba(250,204,21,0.7)] transition-all">
+        {chars.map((ch, idx) => {
+          const isBlank = ch === " ";
+          return (
+            <div
+              key={idx}
+              className={`w-3.5 sm:w-5 h-5 sm:h-7 rounded flex items-center justify-center font-mono font-black text-xs sm:text-base border transition-all ${
+                isBlank
+                  ? "bg-black/80 border-[#1f2d47] text-transparent"
+                  : "bg-gradient-to-b from-[#181a20] via-black to-[#0e1015] border-yellow-500/40 text-yellow-400 shadow-sm"
+              }`}
+            >
+              {!isBlank ? ch : ""}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -130,6 +128,11 @@ export default function GamesHubPage() {
   const [balanceCents, setBalanceCents] = useState<number>(0);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [jackpots, setJackpots] = useState<{ silver: number; gold: number; maximum: number }>({
+    silver: 6565,
+    gold: 59234,
+    maximum: 20744,
+  });
 
   useEffect(() => {
     const fetchBalance = async () => {
@@ -142,14 +145,36 @@ export default function GamesHubPage() {
       } catch {}
     };
 
+    const fetchJackpots = async () => {
+      try {
+        const res = await fetch("/api/jackpots", { cache: "no-store" });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.jackpots) {
+            setJackpots({
+              silver: data.jackpots.silver,
+              gold: data.jackpots.gold,
+              maximum: data.jackpots.maximum,
+            });
+          }
+        }
+      } catch {}
+    };
+
     fetchBalance();
+    fetchJackpots();
+
+    const timer = setInterval(fetchJackpots, 8000);
 
     const unsub = subscribeWalletSync((bal) => {
       if (typeof bal === "number") setBalanceCents(bal);
       else fetchBalance();
     });
 
-    return () => unsub();
+    return () => {
+      clearInterval(timer);
+      unsub();
+    };
   }, []);
 
   const filteredGames = GAMES_CATALOG.filter((game) => {
@@ -188,11 +213,11 @@ export default function GamesHubPage() {
         </div>
       </div>
 
-      {/* 2. Les 3 Jackpots Odomètre Digitaux (Modèle officiel Image 3) */}
-      <div className="grid grid-cols-3 gap-2 bg-[#0c1424] border border-[#18263e] rounded-2xl p-3 shadow-lg">
-        <JackpotOdometer label="SILVER JACKPOT" value="006159" color="silver" />
-        <JackpotOdometer label="GOLD JACKPOT" value="058646" color="gold" />
-        <JackpotOdometer label="MAXIMUM JACKPOT" value="020590" color="max" />
+      {/* 2. Les 3 Jackpots Odomètre Digitaux (Modèle officiel Image 2 & 3) */}
+      <div className="grid grid-cols-3 gap-1.5 sm:gap-4 bg-[#0c1424] border border-[#18263e] rounded-2xl p-2.5 sm:p-3 shadow-lg">
+        <JackpotOdometer label="SILVER JACKPOT" value={jackpots.silver} />
+        <JackpotOdometer label="GOLD JACKPOT" value={jackpots.gold} />
+        <JackpotOdometer label="MAXIMUM JACKPOT" value={jackpots.maximum} />
       </div>
 
       {/* 3. Onglets de Catégories (Modèle officiel Image 3 avec barre jaune) */}

@@ -383,3 +383,22 @@ model SportBet {
   @@index([status])
   @@index([matchId])
 }
+
+// ==========================================
+// CROWD PROGRESSIVE JACKPOTS (SILVER, GOLD, MAX)
+// ==========================================
+
+model ProgressiveJackpot {
+  id                 String    @id // 'SILVER', 'GOLD', 'MAXIMUM'
+  name               String
+  currentAmountCents BigInt    @default(0)
+  seedAmountCents    Int       @default(0)
+  contributionRate   Float     @default(0.005) // ex: 0.5%
+  probability        Float     @default(0.0001)
+  lastWonAt          DateTime?
+  lastWinnerUserId   String?
+  lastWonAmountCents Int?
+  totalPaidOutCents  BigInt    @default(0)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+}
