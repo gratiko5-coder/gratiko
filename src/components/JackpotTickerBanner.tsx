@@ -1,8 +1,17 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 
 export default function JackpotTickerBanner() {
+  const pathname = usePathname();
+
+  // Masquer automatiquement le système de jackpot dès que l'utilisateur clique sur un jeu
+  // (Lucky 6, Keno 80, Roue de la fortune, Pile ou face, Loto minute, Grattage de ticket)
+  const isInsideGame =
+    pathname.startsWith("/games/") ||
+    pathname.startsWith("/tickets/");
+
   const [jackpots, setJackpots] = useState<{
     silver: number;
     gold: number;
@@ -15,6 +24,8 @@ export default function JackpotTickerBanner() {
 
   // Récupération des vraies données en direct depuis la base Supabase
   useEffect(() => {
+    if (isInsideGame) return;
+
     const fetchJackpots = async () => {
       try {
         const res = await fetch("/api/jackpots", { cache: "no-store" });
@@ -38,7 +49,12 @@ export default function JackpotTickerBanner() {
     // Actualisation automatique toutes les 8 secondes pour suivre les mises des joueurs
     const timer = setInterval(fetchJackpots, 8000);
     return () => clearInterval(timer);
-  }, []);
+  }, [isInsideGame]);
+
+  // Si l'utilisateur est dans un jeu actif, ne rien afficher pour lui laisser tout l'écran
+  if (isInsideGame) {
+    return null;
+  }
 
   // Rendu des 6 rouleaux digitaux (exactement comme sur l'Image 2)
   // Les zéros non significatifs au début sont affichés sous forme de cases sombres vides
@@ -68,7 +84,7 @@ export default function JackpotTickerBanner() {
   };
 
   return (
-    <div className="w-full bg-[#0a1120] border-y border-[#18263e] py-2 px-2 shadow-lg">
+    <div className="w-full bg-[#0a1120] border-y border-[#18263e] py-2 px-2 shadow-lg animate-in fade-in">
       <div className="max-w-7xl mx-auto grid grid-cols-3 gap-1.5 sm:gap-4 text-center items-center">
         {/* 1. SILVER JACKPOT */}
         <div className="flex flex-col items-center space-y-1">
