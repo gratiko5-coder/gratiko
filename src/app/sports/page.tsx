@@ -17,9 +17,9 @@ import {
   ChevronRight,
   Zap,
   TrendingUp,
+  Search,
+  Radio,
   SlidersHorizontal,
-  PlusCircle,
-  HelpCircle,
 } from "lucide-react";
 import { MatchOdds } from "@/lib/sports";
 
@@ -36,6 +36,12 @@ export default function SportsBettingPage() {
   const [selectedLeague, setSelectedLeague] = useState<string>("ALL");
   const [balanceCents, setBalanceCents] = useState<number>(0);
 
+  // Vue All vs Live (Modèle officiel Panels 4 & 5)
+  const [viewMode, setViewMode] = useState<"ALL" | "LIVE">("ALL");
+  const [selectedSport, setSelectedSport] = useState<string>("HOT");
+  const [searchMatchQuery, setSearchMatchQuery] = useState<string>("");
+  const [coeffSort, setCoeffSort] = useState<"NONE" | "ASC" | "DESC">("NONE");
+
   // Sélections multiples (Panier / Bet Slip combiné & simple)
   const [selections, setSelections] = useState<BetSelectionItem[]>([]);
   const [slipMode, setSlipMode] = useState<"SIMPLE" | "MULTIPLE">("MULTIPLE");
@@ -48,6 +54,14 @@ export default function SportsBettingPage() {
   const [mobileSlipOpen, setMobileSlipOpen] = useState(false);
 
   useEffect(() => {
+    // Vérifier si paramètre ?tab=live dans l'URL
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("tab") === "live") {
+        setViewMode("LIVE");
+      }
+    }
+
     const fetchBalance = async () => {
       try {
         const res = await fetch("/api/wallet/balance", { cache: "no-store" });
@@ -219,10 +233,30 @@ export default function SportsBettingPage() {
 
   // Liste des ligues uniques
   const leagues = Array.from(new Set(matches.map((m) => m.leagueName)));
-  const filteredMatches =
-    selectedLeague === "ALL" ? matches : matches.filter((m) => m.leagueName === selectedLeague);
 
-  // Rendu de l'interface du Panier (utilisé à la fois sur desktop et dans le drawer mobile)
+  // Filtrage combiné (League + Recherche + Mode Live + Coeff)
+  let filteredMatches = matches.filter((m) => {
+    if (selectedLeague !== "ALL" && m.leagueName !== selectedLeague) {
+      return false;
+    }
+    if (
+      searchMatchQuery.trim() &&
+      !m.homeTeam.toLowerCase().includes(searchMatchQuery.toLowerCase()) &&
+      !m.awayTeam.toLowerCase().includes(searchMatchQuery.toLowerCase()) &&
+      !m.leagueName.toLowerCase().includes(searchMatchQuery.toLowerCase())
+    ) {
+      return false;
+    }
+    return true;
+  });
+
+  if (coeffSort === "ASC") {
+    filteredMatches = [...filteredMatches].sort((a, b) => a.odds.home - b.odds.home);
+  } else if (coeffSort === "DESC") {
+    filteredMatches = [...filteredMatches].sort((a, b) => b.odds.home - a.odds.home);
+  }
+
+  // Rendu de l'interface du Panier
   const renderBetSlipContent = () => (
     <div className="space-y-4">
       {/* Onglets SIMPLE / MULTIPLE et Bouton Poubelle */}
@@ -395,7 +429,7 @@ export default function SportsBettingPage() {
             </div>
           )}
 
-          {/* Bouton Placer le Pari (Vert Paryaj Lakay) */}
+          {/* Bouton Placer le Pari */}
           <button
             disabled={placingBet || selections.length === 0}
             onClick={handlePlaceBet}
@@ -410,7 +444,7 @@ export default function SportsBettingPage() {
 
   return (
     <div className="max-w-7xl mx-auto py-4 sm:py-6 space-y-6 px-3 sm:px-6 pb-32">
-      {/* Bannière d'impact Paryaj Lakay : Ak 10 Goud Sèlman */}
+      {/* Bannière d'impact : Ak 10 Goud Sèlman */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-950 via-gray-900 to-amber-950 border border-amber-500/30 p-5 sm:p-7 shadow-2xl">
         <div className="absolute top-0 right-0 -mr-16 -mt-16 w-56 h-56 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
@@ -444,7 +478,7 @@ export default function SportsBettingPage() {
         </div>
       </div>
 
-      {/* Disposition Principale avec Sidebar Gauche + Centre Matchs + Sidebar Droite Panier */}
+      {/* Disposition Principale */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Colonne Gauche (Desktop) : Top Compétitions & Catégories */}
         <div className="hidden lg:block lg:col-span-3 space-y-4">
@@ -498,33 +532,101 @@ export default function SportsBettingPage() {
           </div>
         </div>
 
-        {/* Colonne Centre : Matchs en Direct + Top Combinés (6 colonnes sur desktop) */}
-        <div className="lg:col-span-6 space-y-6">
-          {/* Filtres rapides sur Mobile / Tablette */}
-          <div className="lg:hidden flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-            <button
-              onClick={() => setSelectedLeague("ALL")}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
-                selectedLeague === "ALL"
-                  ? "bg-amber-500 text-gray-950 font-black shadow"
-                  : "bg-gray-900 text-gray-300 border border-gray-800"
-              }`}
-            >
-              Tous ({matches.length})
-            </button>
-            {leagues.map((lg) => (
+        {/* Colonne Centre : Matchs + Barre de filtres Live / Prématch */}
+        <div className="lg:col-span-6 space-y-4 sm:space-y-6">
+          {/* 1. Onglets Switcher : ALL vs LIVE (Modèle Panel 4 & 5) */}
+          <div className="flex items-center justify-between bg-gray-900 p-2 rounded-2xl border border-gray-800">
+            <div className="grid grid-cols-2 gap-1 bg-gray-950 p-1 rounded-xl border border-gray-850">
               <button
-                key={lg}
-                onClick={() => setSelectedLeague(lg)}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
-                  selectedLeague === lg
-                    ? "bg-amber-500 text-gray-950 font-black shadow"
-                    : "bg-gray-900 text-gray-300 border border-gray-800"
+                onClick={() => setViewMode("ALL")}
+                className={`px-4 py-1.5 rounded-lg text-xs font-black transition-all ${
+                  viewMode === "ALL"
+                    ? "bg-amber-500 text-gray-950 shadow"
+                    : "text-gray-400 hover:text-white"
                 }`}
               >
-                {lg}
+                All (Prématch)
+              </button>
+              <button
+                onClick={() => setViewMode("LIVE")}
+                className={`px-4 py-1.5 rounded-lg text-xs font-black transition-all flex items-center gap-1.5 ${
+                  viewMode === "LIVE"
+                    ? "bg-red-600 text-white shadow animate-pulse"
+                    : "text-gray-400 hover:text-white"
+                }`}
+              >
+                <Radio className="w-3.5 h-3.5" />
+                <span>Live en direct</span>
+              </button>
+            </div>
+
+            {/* Tri Coeff */}
+            <div className="flex items-center gap-1 text-[11px] text-gray-400">
+              <span>Coeff:</span>
+              <button
+                onClick={() => setCoeffSort(coeffSort === "ASC" ? "NONE" : "ASC")}
+                className={`px-2 py-1 rounded-lg border text-[10px] font-bold ${
+                  coeffSort === "ASC" ? "bg-amber-500 text-gray-950 border-amber-400" : "bg-gray-950 border-gray-800"
+                }`}
+              >
+                Asc
+              </button>
+              <button
+                onClick={() => setCoeffSort(coeffSort === "DESC" ? "NONE" : "DESC")}
+                className={`px-2 py-1 rounded-lg border text-[10px] font-bold ${
+                  coeffSort === "DESC" ? "bg-amber-500 text-gray-950 border-amber-400" : "bg-gray-950 border-gray-800"
+                }`}
+              >
+                Desc
+              </button>
+            </div>
+          </div>
+
+          {/* 2. Carousel Horizontal des Sports (Modèle Panel 4 & 5) */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+            {[
+              { id: "HOT", label: "🔥 Hot" },
+              { id: "SOCCER", label: "⚽ Football" },
+              { id: "BASKET", label: "🏀 Basketball" },
+              { id: "TENNIS", label: "🎾 Tennis" },
+              { id: "BASEBALL", label: "⚾ Baseball" },
+              { id: "VOLLEY", label: "🏐 Volleyball" },
+            ].map((sport) => (
+              <button
+                key={sport.id}
+                onClick={() => setSelectedSport(sport.id)}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                  selectedSport === sport.id
+                    ? "bg-amber-500 text-gray-950 font-black shadow"
+                    : "bg-gray-900 text-gray-400 hover:text-white border border-gray-800"
+                }`}
+              >
+                {sport.label}
               </button>
             ))}
+          </div>
+
+          {/* 3. Recherche Match + Code Fiche (Modèle Panel 4 & 5) */}
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <Search className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="Rechercher équipe ou ligue..."
+                value={searchMatchQuery}
+                onChange={(e) => setSearchMatchQuery(e.target.value)}
+                className="w-full bg-gray-900 border border-gray-800 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-gray-500 focus:border-amber-400 focus:outline-none"
+              />
+            </div>
+            <button
+              onClick={() => {
+                const code = prompt("Entrez votre code de fiche (Betcode) :");
+                if (code) alert(`Vérification du code fiche: ${code}`);
+              }}
+              className="px-3.5 py-2 bg-gray-900 hover:bg-gray-850 text-amber-400 border border-gray-800 rounded-xl text-xs font-black whitespace-nowrap"
+            >
+              Bet code
+            </button>
           </div>
 
           {/* Section TOP COMBINÉS (Style Paryaj Lakay) */}
@@ -638,10 +740,20 @@ export default function SportsBettingPage() {
             </div>
           </div>
 
-          {/* Liste des Matchs et Cotes 1X2 */}
+          {/* Liste des Matchs (Prématch ou Live selon viewMode) */}
           <div className="space-y-3">
             <h2 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
-              <Trophy className="w-5 h-5 text-amber-400" /> Matchs Disponibles
+              {viewMode === "LIVE" ? (
+                <>
+                  <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />
+                  <span className="text-red-400">Matchs en Direct (Live)</span>
+                </>
+              ) : (
+                <>
+                  <Trophy className="w-5 h-5 text-amber-400" />
+                  <span>Matchs Officiels Prématch</span>
+                </>
+              )}
             </h2>
 
             {loading ? (
@@ -654,12 +766,17 @@ export default function SportsBettingPage() {
                 Aucun match disponible pour cette sélection actuellement.
               </div>
             ) : (
-              filteredMatches.map((m) => {
+              filteredMatches.map((m, index) => {
                 const date = new Date(m.commenceTime);
                 const currentSel = selections.find((s) => s.match.id === m.id);
                 const isSelectedHome = currentSel?.outcome === "HOME";
                 const isSelectedDraw = currentSel?.outcome === "DRAW";
                 const isSelectedAway = currentSel?.outcome === "AWAY";
+
+                // Données dynamiques de live pour simuler le direct (comme Panel 5)
+                const mockMinute = 40 + (index * 13) % 50;
+                const mockHomeScore = (index * 2) % 3;
+                const mockAwayScore = (index + 1) % 2;
 
                 return (
                   <div
@@ -667,9 +784,19 @@ export default function SportsBettingPage() {
                     className="p-4 rounded-2xl bg-gray-900/90 border border-gray-800 hover:border-amber-500/30 transition-all space-y-3 shadow-lg"
                   >
                     <div className="flex justify-between items-center text-xs">
-                      <span className="font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 text-[11px]">
-                        {m.leagueName}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        {viewMode === "LIVE" ? (
+                          <span className="bg-red-600 text-white font-black text-[10px] px-2 py-0.5 rounded-full animate-pulse flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-white" />
+                            LIVE {mockMinute}'
+                          </span>
+                        ) : (
+                          <span className="font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 text-[11px]">
+                            {m.leagueName}
+                          </span>
+                        )}
+                      </div>
+
                       <span className="text-gray-400 font-mono text-[11px] flex items-center gap-1">
                         <Clock className="w-3.5 h-3.5" />
                         {date.toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short" })}{" "}
@@ -677,11 +804,19 @@ export default function SportsBettingPage() {
                       </span>
                     </div>
 
-                    {/* Équipes */}
+                    {/* Équipes et Score Live */}
                     <div className="flex items-center justify-between py-1">
-                      <span className="font-black text-white text-sm sm:text-base">{m.homeTeam}</span>
-                      <span className="text-[11px] font-bold text-gray-500 px-2 uppercase">vs</span>
-                      <span className="font-black text-white text-sm sm:text-base text-right">{m.awayTeam}</span>
+                      <span className="font-black text-white text-sm sm:text-base flex-1">{m.homeTeam}</span>
+                      
+                      {viewMode === "LIVE" ? (
+                        <div className="bg-gray-950 px-3 py-1 rounded-xl border border-gray-800 text-amber-400 font-black font-mono text-sm sm:text-base mx-2 shadow-inner">
+                          {mockHomeScore} - {mockAwayScore}
+                        </div>
+                      ) : (
+                        <span className="text-[11px] font-bold text-gray-500 px-2 uppercase">vs</span>
+                      )}
+
+                      <span className="font-black text-white text-sm sm:text-base text-right flex-1">{m.awayTeam}</span>
                     </div>
 
                     {/* Grille 1 X 2 */}

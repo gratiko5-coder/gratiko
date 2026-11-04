@@ -3,7 +3,20 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { formatCurrency } from "@/lib/i18n";
-import { ArrowLeft, Ticket, Clock, CheckCircle2, XCircle, Layers, Calendar, Trophy } from "lucide-react";
+import {
+  ArrowLeft,
+  Ticket,
+  Clock,
+  CheckCircle2,
+  XCircle,
+  Layers,
+  Calendar,
+  Search,
+  Filter,
+  AlertCircle,
+  Inbox,
+  ArrowRight,
+} from "lucide-react";
 import { BetSelectionDetail } from "@/lib/sports";
 
 interface SportBetItem {
@@ -26,6 +39,12 @@ export default function MyBetsPage() {
   const [bets, setBets] = useState<SportBetItem[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Filtres d'état (Modèle Panel 3 : Settled vs Unsettled)
+  const [activeTab, setActiveTab] = useState<"ALL" | "UNSETTLED" | "SETTLED">("ALL");
+  const [searchTicket, setSearchTicket] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
   useEffect(() => {
     const fetchBets = async () => {
       try {
@@ -43,8 +62,33 @@ export default function MyBetsPage() {
     fetchBets();
   }, []);
 
+  // Filtrage selon les onglets et critères
+  const filteredBets = bets.filter((b) => {
+    // 1. Filtrage par onglet Settled / Unsettled
+    if (activeTab === "UNSETTLED" && b.status !== "PENDING") return false;
+    if (activeTab === "SETTLED" && b.status === "PENDING") return false;
+
+    // 2. Recherche par numéro de ticket
+    if (searchTicket.trim() && !b.betTicketNumber.toLowerCase().includes(searchTicket.toLowerCase().trim())) {
+      return false;
+    }
+
+    // 3. Filtrage par plage de dates
+    if (startDate) {
+      const betDate = new Date(b.createdAt).toISOString().slice(0, 10);
+      if (betDate < startDate) return false;
+    }
+    if (endDate) {
+      const betDate = new Date(b.createdAt).toISOString().slice(0, 10);
+      if (betDate > endDate) return false;
+    }
+
+    return true;
+  });
+
   return (
-    <div className="max-w-4xl mx-auto py-6 space-y-6 px-4 pb-28">
+    <div className="max-w-4xl mx-auto py-6 space-y-6 px-3 sm:px-6 pb-28">
+      {/* En-tête */}
       <div className="flex items-center justify-between">
         <Link
           href="/sports"
@@ -59,32 +103,129 @@ export default function MyBetsPage() {
 
       <div className="space-y-1">
         <h1 className="text-2xl sm:text-3xl font-black text-white flex items-center gap-2">
-          <Ticket className="w-7 h-7 text-amber-400" /> Mes Fiches de Paris
+          <Ticket className="w-7 h-7 text-amber-400" /> Mes Paris (My Bets)
         </h1>
         <p className="text-xs text-gray-400">
-          Suivi en temps réel de vos coupons simples et combinés (Paryaj Lakay style)
+          Suivi de toutes vos fiches de paris en direct, simples et combinées.
         </p>
       </div>
 
+      {/* Onglets SETTLED / UNSETTLED (Modèle officiel Panel 3) */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-gray-900/90 p-2 rounded-2xl border border-gray-800">
+        <div className="grid grid-cols-3 gap-1 bg-gray-950 p-1 rounded-xl border border-gray-850">
+          <button
+            onClick={() => setActiveTab("ALL")}
+            className={`py-2 px-3 rounded-lg text-xs font-bold transition-all ${
+              activeTab === "ALL"
+                ? "bg-amber-500 text-gray-950 shadow font-black"
+                : "text-gray-400 hover:text-white"
+            }`}
+          >
+            Tous ({bets.length})
+          </button>
+          <button
+            onClick={() => setActiveTab("UNSETTLED")}
+            className={`py-2 px-3 rounded-lg text-xs font-bold transition-all ${
+              activeTab === "UNSETTLED"
+                ? "bg-amber-500 text-gray-950 shadow font-black"
+                : "text-gray-400 hover:text-white"
+            }`}
+          >
+            En cours ({bets.filter((b) => b.status === "PENDING").length})
+          </button>
+          <button
+            onClick={() => setActiveTab("SETTLED")}
+            className={`py-2 px-3 rounded-lg text-xs font-bold transition-all ${
+              activeTab === "SETTLED"
+                ? "bg-amber-500 text-gray-950 shadow font-black"
+                : "text-gray-400 hover:text-white"
+            }`}
+          >
+            Terminés ({bets.filter((b) => b.status !== "PENDING").length})
+          </button>
+        </div>
+
+        {/* Recherche par Code Ticket */}
+        <div className="relative">
+          <Search className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2" />
+          <input
+            type="text"
+            placeholder="Rechercher code fiche..."
+            value={searchTicket}
+            onChange={(e) => setSearchTicket(e.target.value)}
+            className="w-full sm:w-56 bg-gray-950 border border-gray-800 rounded-xl pl-9 pr-3 py-1.5 text-xs text-white placeholder-gray-500 focus:border-amber-400 focus:outline-none"
+          />
+        </div>
+      </div>
+
+      {/* Filtres de Dates (Modèle Panel 3 avec calendrier) */}
+      <div className="flex flex-wrap items-center gap-2 p-3 bg-gray-900/60 rounded-xl border border-gray-850 text-xs text-gray-300">
+        <span className="flex items-center gap-1.5 font-bold text-gray-400 mr-2">
+          <Calendar className="w-3.5 h-3.5 text-amber-400" /> Période :
+        </span>
+        <div className="flex items-center gap-1.5">
+          <span className="text-gray-500">Du</span>
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="bg-gray-950 border border-gray-800 rounded-lg px-2 py-1 text-xs text-white focus:outline-none focus:border-amber-400"
+          />
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="text-gray-500">Au</span>
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="bg-gray-950 border border-gray-800 rounded-lg px-2 py-1 text-xs text-white focus:outline-none focus:border-amber-400"
+          />
+        </div>
+        {(startDate || endDate || searchTicket) && (
+          <button
+            onClick={() => {
+              setStartDate("");
+              setEndDate("");
+              setSearchTicket("");
+            }}
+            className="text-[11px] text-amber-400 hover:underline ml-auto font-semibold"
+          >
+            Réinitialiser
+          </button>
+        )}
+      </div>
+
+      {/* Contenu principal */}
       {loading ? (
-        <div className="p-12 text-center text-gray-500">
-          <div className="w-8 h-8 border-2 border-amber-400 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+        <div className="p-16 text-center text-gray-500 space-y-2">
+          <div className="w-8 h-8 border-2 border-amber-400 border-t-transparent rounded-full animate-spin mx-auto" />
           <p className="text-xs">Chargement de vos fiches de paris...</p>
         </div>
-      ) : bets.length === 0 ? (
-        <div className="p-10 rounded-2xl bg-gray-900 border border-gray-800 text-center space-y-3">
-          <Ticket className="w-10 h-10 text-gray-600 mx-auto" />
-          <p className="text-sm text-gray-300 font-medium">Vous n'avez placé aucun pari sportif pour le moment.</p>
+      ) : filteredBets.length === 0 ? (
+        /* Empty state identique à Panel 3 : "There is nothing here yet" */
+        <div className="p-16 rounded-3xl bg-gray-900/60 border border-gray-800 text-center space-y-4 shadow-xl">
+          <div className="w-16 h-16 bg-gray-950 border border-gray-850 rounded-2xl flex items-center justify-center mx-auto text-gray-600 shadow-inner">
+            <Inbox className="w-8 h-8" />
+          </div>
+          <div className="space-y-1">
+            <h3 className="text-base font-bold text-gray-200">
+              There is nothing here yet
+            </h3>
+            <p className="text-xs text-gray-500 max-w-sm mx-auto">
+              Aucun pari ne correspond à vos filtres actuels. Placez votre première fiche ou modifiez vos critères.
+            </p>
+          </div>
           <Link
             href="/sports"
-            className="inline-block px-5 py-2.5 bg-amber-500 text-gray-950 font-bold rounded-xl text-xs hover:bg-amber-400 transition-colors shadow"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-500 text-gray-950 font-black rounded-xl text-xs hover:bg-amber-400 transition-all shadow-md active:scale-95"
           >
-            Placer mon premier pari
+            <span>Placer une fiche maintenant</span>
+            <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
       ) : (
         <div className="space-y-4">
-          {bets.map((b) => {
+          {filteredBets.map((b) => {
             let selections: BetSelectionDetail[] = [];
             if (b.selectionsJson) {
               try {
@@ -103,7 +244,7 @@ export default function MyBetsPage() {
                 {/* Header Ticket */}
                 <div className="flex justify-between items-center text-xs">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-gray-400 font-bold">N° {b.betTicketNumber}</span>
+                    <span className="font-mono text-gray-300 font-bold">N° {b.betTicketNumber}</span>
                     <span
                       className={`text-[10px] font-black px-2 py-0.5 rounded uppercase ${
                         isMultiple
