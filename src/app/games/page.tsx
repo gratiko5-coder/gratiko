@@ -21,96 +21,110 @@ import {
 interface GameCard {
   id: string;
   title: string;
-  category: "keno" | "lucky6" | "scratch" | "instant";
+  category: "popular" | "keno" | "lucky6" | "scratch" | "instant";
   badge?: string;
-  image: string;
   href: string;
   description: string;
   maxWin: string;
+  bgGradient: string;
 }
 
 const GAMES_CATALOG: GameCard[] = [
-  {
-    id: "keno-80",
-    title: "KENO 80",
-    category: "keno",
-    badge: "POPULAIRE",
-    image: "/games/keno.jpg",
-    href: "/games/keno",
-    description: "Tirage de 20 boules parmi 80. Choisissez vos numéros porte-bonheur.",
-    maxWin: "Jusqu'à 50 000x",
-  },
   {
     id: "lucky-6",
     title: "LUCKY 6",
     category: "lucky6",
     badge: "LIVE 45s",
-    image: "/games/lucky6.jpg",
     href: "/games/lucky6",
-    description: "48 boules multicolores. 6 numéros gagnants à compléter avant la 35e boule !",
-    maxWin: "Jusqu'à 10 000x",
+    description: "48 boules multicolores. Complétez vos 6 numéros pour remporter jusqu'à x10 000 !",
+    maxWin: "x10 000",
+    bgGradient: "from-rose-950 via-red-900 to-rose-950",
+  },
+  {
+    id: "keno-80",
+    title: "KENO 80",
+    category: "keno",
+    badge: "POPULAIRE",
+    href: "/games/keno",
+    description: "Tirage rapide de 20 boules parmi 80 sur tapis vert casino officiel.",
+    maxWin: "x50 000",
+    bgGradient: "from-emerald-950 via-green-900 to-emerald-950",
   },
   {
     id: "scratch-100",
-    title: "Chans Lakay 100",
+    title: "CHANS LAKAY 100",
     category: "scratch",
-    badge: "GRATTEZ",
-    image: "/games/scratch100.jpg",
+    badge: "GRATTAGE",
     href: "/tickets",
     description: "Le ticket classique populaire à 100 Gourdes. 3 symboles identiques pour gagner !",
     maxWin: "3 000 HTG",
-  },
-  {
-    id: "scratch-250",
-    title: "Gwo Lòt 250",
-    category: "scratch",
-    badge: "JACKPOT",
-    image: "/games/scratch250.jpg",
-    href: "/tickets",
-    description: "Ticket intermédiaire à fort potentiel de gains pour les joueurs assidus.",
-    maxWin: "15 000 HTG",
-  },
-  {
-    id: "scratch-500",
-    title: "Millionnaire 500",
-    category: "scratch",
-    badge: "SUPER CASH",
-    image: "/games/scratch500.jpg",
-    href: "/tickets",
-    description: "Le grand ticket VIP. Tentez votre chance pour décrocher la cagnotte maximale.",
-    maxWin: "50 000 HTG",
+    bgGradient: "from-amber-950 via-yellow-900 to-amber-950",
   },
   {
     id: "wheel-instant",
-    title: "Roue de la Fortune",
+    title: "ROULETTE FORTUNE",
     category: "instant",
     badge: "INSTANT",
-    image: "/games/wheel.jpg",
     href: "/games/wheel",
-    description: "Faites tourner la roue festive et multipliez votre mise instantanément.",
-    maxWin: "x10 votre mise",
+    description: "Faites tourner la roue et multipliez votre mise instantanément.",
+    maxWin: "x10 mise",
+    bgGradient: "from-indigo-950 via-purple-900 to-indigo-950",
   },
   {
     id: "coinflip-instant",
-    title: "Pile ou Face (Kwa/Tèt)",
+    title: "CRASH & COINFLIP",
     category: "instant",
-    badge: "FLASH",
-    image: "/games/coinflip.jpg",
+    badge: "FLASH 2s",
     href: "/games/coinflip",
-    description: "Un classique rapide : choisissez Kwa ou Tèt pour doubler votre mise en 2 secondes.",
-    maxWin: "x2 votre mise",
+    description: "Doublez votre mise en 2 secondes en choisissant Pile ou Face (Kwa / Tèt).",
+    maxWin: "x2 mise",
+    bgGradient: "from-blue-950 via-sky-900 to-blue-950",
   },
   {
     id: "loto-minute",
-    title: "Loto Minute 3 Boules",
+    title: "LOTO MINUTE",
     category: "instant",
     badge: "TIRAGE",
-    image: "/games/loto.jpg",
     href: "/games/loto",
-    description: "Tirage express de 3 numéros parmi 30 pour des gains rapides et réguliers.",
-    maxWin: "x50 votre mise",
+    description: "Tirage express de 3 numéros parmi 30 pour des gains réguliers.",
+    maxWin: "x50 mise",
+    bgGradient: "from-violet-950 via-indigo-900 to-violet-950",
   },
 ];
+
+// Composant pour afficher les compteurs sous forme de cases de rouleaux digitaux (Modèle Image 3)
+function JackpotOdometer({ label, value, color }: { label: string; value: string; color: "silver" | "gold" | "max" }) {
+  const digits = value.padStart(6, "0").split("");
+
+  return (
+    <div className="flex flex-col items-center space-y-1">
+      <span
+        className={`text-[9px] sm:text-[10px] font-black uppercase tracking-wider ${
+          color === "gold" ? "text-amber-400" : color === "silver" ? "text-gray-300" : "text-amber-500"
+        }`}
+      >
+        {label}
+      </span>
+
+      <div className="flex items-center gap-0.5 sm:gap-1 bg-black/80 p-1 rounded-lg border border-[#1f2d47] shadow-inner">
+        {digits.map((d, i) => (
+          <span
+            key={i}
+            className={`w-4 h-6 sm:w-5 sm:h-7 rounded flex items-center justify-center font-mono font-black text-xs sm:text-sm border ${
+              color === "gold"
+                ? "text-yellow-400 border-yellow-500/40 bg-gradient-to-b from-yellow-950/40 to-black"
+                : color === "silver"
+                ? "text-gray-200 border-gray-500/40 bg-gradient-to-b from-gray-900 to-black"
+                : "text-amber-400 border-amber-600/40 bg-gradient-to-b from-amber-950/40 to-black"
+            }`}
+          >
+            {d}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function GamesHubPage() {
   const [balanceCents, setBalanceCents] = useState<number>(0);
@@ -149,82 +163,55 @@ export default function GamesHubPage() {
   });
 
   return (
-    <div className="max-w-7xl mx-auto py-4 sm:py-6 space-y-6 px-3 sm:px-6 pb-28">
-      {/* 1. Bannière Principale Slots & Games (Modèle Panel 2) */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-700 p-6 sm:p-8 shadow-2xl text-gray-950 border border-amber-300">
-        <div className="absolute top-0 right-0 -mr-12 -mt-12 w-64 h-64 bg-white/20 rounded-full blur-2xl pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="space-y-1.5">
-            <span className="text-[11px] font-black uppercase tracking-wider bg-gray-950 text-amber-400 px-3 py-1 rounded-full inline-block shadow">
-              PROMO DU MOIS
+    <div className="max-w-7xl mx-auto space-y-4 pb-20">
+      {/* 1. Bannière Principale Slots & Games (Modèle officiel Image 3) */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#0d1627] via-[#101e38] to-[#142340] border border-[#1b2b48] p-4 sm:p-6 shadow-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 relative z-10">
+          <div className="space-y-1">
+            <span className="text-[10px] bg-red-600 text-white font-black px-2 py-0.5 rounded uppercase">
+              1 CAR • 11 MOTORCYCLES • HTG 1.8M CASH
             </span>
-            <h1 className="text-2xl sm:text-4xl font-black leading-tight tracking-tight">
-              2 500 000 HTG SLOTS & GAMES DRAW !
+            <h1 className="text-xl sm:text-3xl font-black text-white leading-tight">
+              SLOTS, KENO, LUCKY 6 & GRATTAGE
             </h1>
-            <p className="text-xs sm:text-sm font-bold text-gray-900 max-w-xl">
-              Jouez au Keno 80, Lucky 6, Grattage et Jeux Instantanés pour accumuler des points et remporter la super cagnotte !
+            <p className="text-xs text-gray-300">
+              Découvrez la plus grande sélection de jeux instantanés en Haïti.
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
-            <Link
-              href="/games/keno"
-              className="px-5 py-3 bg-gray-950 hover:bg-black text-amber-400 font-black text-xs sm:text-sm rounded-2xl shadow-xl transition-all flex items-center gap-2 active:scale-95"
-            >
-              <span>JOUER AU KENO 80</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
+          <Link
+            href="/games/lucky6"
+            className="px-4 py-2.5 bg-amber-400 hover:bg-amber-300 text-gray-950 font-black text-xs rounded-xl shadow-lg transition-all self-start sm:self-center uppercase tracking-wider"
+          >
+            Lancer Lucky 6
+          </Link>
         </div>
       </div>
 
-      {/* 2. Jackpots Tickers Animés (Silver, Gold, Max comme sur Panel 2) */}
-      <div className="grid grid-cols-3 gap-2 sm:gap-4">
-        <div className="bg-gradient-to-b from-gray-900 via-gray-950 to-black border border-gray-800 rounded-2xl p-3 sm:p-4 text-center shadow-lg">
-          <p className="text-[9px] sm:text-[11px] font-black uppercase text-gray-400 tracking-wider">
-            SILVER JACKPOT
-          </p>
-          <p className="text-sm sm:text-xl font-black font-mono text-amber-300 mt-1">
-            15 744,00 HTG
-          </p>
-        </div>
-
-        <div className="bg-gradient-to-b from-amber-950/60 via-gray-950 to-black border border-amber-500/50 rounded-2xl p-3 sm:p-4 text-center shadow-xl">
-          <p className="text-[9px] sm:text-[11px] font-black uppercase text-amber-400 tracking-wider flex items-center justify-center gap-1">
-            <Flame className="w-3.5 h-3.5 text-amber-400 animate-pulse" /> GOLD JACKPOT
-          </p>
-          <p className="text-base sm:text-2xl font-black font-mono text-amber-400 mt-1">
-            11 583,00 HTG
-          </p>
-        </div>
-
-        <div className="bg-gradient-to-b from-emerald-950/60 via-gray-950 to-black border border-emerald-500/40 rounded-2xl p-3 sm:p-4 text-center shadow-lg">
-          <p className="text-[9px] sm:text-[11px] font-black uppercase text-emerald-400 tracking-wider">
-            MAXIMUM JACKPOT
-          </p>
-          <p className="text-sm sm:text-xl font-black font-mono text-emerald-300 mt-1">
-            8 214,00 HTG
-          </p>
-        </div>
+      {/* 2. Les 3 Jackpots Odomètre Digitaux (Modèle officiel Image 3) */}
+      <div className="grid grid-cols-3 gap-2 bg-[#0c1424] border border-[#18263e] rounded-2xl p-3 shadow-lg">
+        <JackpotOdometer label="SILVER JACKPOT" value="006159" color="silver" />
+        <JackpotOdometer label="GOLD JACKPOT" value="058646" color="gold" />
+        <JackpotOdometer label="MAXIMUM JACKPOT" value="020590" color="max" />
       </div>
 
-      {/* 3. Onglets de Catégories Horizontaux (Modèle Panel 2) */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+      {/* 3. Onglets de Catégories (Modèle officiel Image 3 avec barre jaune) */}
+      <div className="flex items-center gap-4 overflow-x-auto pb-1.5 border-b border-gray-800 scrollbar-none text-xs">
         {[
-          { id: "all", label: "Tous les Jeux" },
-          { id: "keno", label: "Keno 80" },
+          { id: "all", label: "All" },
+          { id: "popular", label: "Popular" },
           { id: "lucky6", label: "Lucky 6" },
-          { id: "scratch", label: "Tickets Grattage" },
-          { id: "instant", label: "Jeux Instantanés" },
+          { id: "keno", label: "Keno 80" },
+          { id: "scratch", label: "Grattage" },
+          { id: "instant", label: "Instant" },
         ].map((tab) => (
           <button
             key={tab.id}
             onClick={() => setSelectedCategory(tab.id)}
-            className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+            className={`font-black pb-1.5 whitespace-nowrap transition-all ${
               selectedCategory === tab.id
-                ? "bg-amber-500 text-gray-950 font-black shadow-md"
-                : "bg-gray-900 text-gray-400 hover:text-white border border-gray-800"
+                ? "text-amber-400 border-b-2 border-amber-400"
+                : "text-gray-400 hover:text-white"
             }`}
           >
             {tab.label}
@@ -237,66 +224,63 @@ export default function GamesHubPage() {
         <Search className="w-4 h-4 text-gray-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
         <input
           type="text"
-          placeholder="Rechercher un jeu (Keno, Lucky 6, Grattage...)"
+          placeholder="Search game"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full bg-gray-900 border border-gray-800 rounded-2xl pl-10 pr-4 py-2.5 text-xs sm:text-sm text-white placeholder-gray-500 focus:border-amber-400 focus:outline-none"
+          className="w-full bg-[#0c1424] border border-[#18263e] rounded-xl pl-10 pr-4 py-2 text-xs sm:text-sm text-white placeholder-gray-500 focus:border-amber-400 focus:outline-none"
         />
       </div>
 
-      {/* 5. Grille des Cartes de Jeux (Modèle Panel 2 & 6) */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
-        {filteredGames.map((game) => (
-          <Link
-            key={game.id}
-            href={game.href}
-            className="group rounded-2xl bg-gradient-to-b from-gray-900 to-gray-950 border border-gray-800 hover:border-amber-500/50 p-3 sm:p-4 transition-all duration-300 flex flex-col justify-between shadow-lg hover:shadow-amber-500/10 active:scale-98"
-          >
-            <div className="space-y-2.5">
-              {/* Vignette avec Dégradé et Icône */}
-              <div className="h-28 sm:h-32 rounded-xl bg-gradient-to-br from-indigo-950 via-gray-900 to-amber-950 flex flex-col items-center justify-center p-3 text-center border border-gray-800 relative overflow-hidden group-hover:scale-102 transition-transform">
-                {game.badge && (
-                  <span className="absolute top-2 right-2 text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-amber-500 text-gray-950 shadow">
+      {/* 5. Section "Popular" (Grandes Cartes Verticales comme Image 3) */}
+      <div className="space-y-3">
+        <h2 className="text-sm font-black text-white uppercase tracking-wider">
+          Popular Games
+        </h2>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+          {filteredGames.map((game) => (
+            <Link
+              key={game.id}
+              href={game.href}
+              className={`rounded-2xl bg-gradient-to-b ${game.bgGradient} border border-[#1b2b48] hover:border-amber-400/60 p-3 flex flex-col justify-between min-h-[190px] shadow-lg group hover:scale-102 transition-all duration-300`}
+            >
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-black/60 text-amber-400 border border-amber-500/30">
                     {game.badge}
                   </span>
-                )}
+                  <span className="text-[10px] font-mono font-bold text-gray-300">
+                    {game.maxWin}
+                  </span>
+                </div>
 
-                {game.category === "keno" ? (
-                  <div className="w-12 h-12 rounded-full bg-emerald-600 text-white font-black text-lg flex items-center justify-center shadow-lg">
-                    80
-                  </div>
-                ) : game.category === "lucky6" ? (
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-red-600 via-amber-500 to-blue-600 text-white font-black text-lg flex items-center justify-center shadow-lg">
-                    6
-                  </div>
-                ) : game.category === "scratch" ? (
-                  <Ticket className="w-10 h-10 text-amber-400" />
-                ) : (
-                  <Sparkles className="w-10 h-10 text-emerald-400" />
-                )}
+                <div className="h-20 flex items-center justify-center">
+                  {game.category === "lucky6" ? (
+                    <div className="w-14 h-14 rounded-full bg-red-600 text-white font-black text-2xl flex items-center justify-center shadow-2xl ring-4 ring-yellow-400 animate-pulse">
+                      6
+                    </div>
+                  ) : game.category === "keno" ? (
+                    <div className="w-14 h-14 rounded-full bg-emerald-600 text-white font-black text-2xl flex items-center justify-center shadow-2xl ring-4 ring-emerald-300">
+                      80
+                    </div>
+                  ) : (
+                    <Ticket className="w-12 h-12 text-amber-300" />
+                  )}
+                </div>
 
-                <p className="font-black text-white text-sm sm:text-base mt-2 truncate w-full">
+                <h3 className="text-center font-black text-white text-xs sm:text-sm uppercase tracking-wide">
                   {game.title}
-                </p>
+                </h3>
               </div>
 
-              <div>
-                <p className="text-[11px] text-gray-400 line-clamp-2 leading-relaxed">
-                  {game.description}
-                </p>
+              <div className="pt-2 border-t border-black/30 flex items-center justify-center">
+                <span className="w-full py-1.5 bg-amber-400 group-hover:bg-amber-300 text-gray-950 font-black rounded-lg text-xs text-center uppercase tracking-wider shadow">
+                  Play now
+                </span>
               </div>
-            </div>
-
-            <div className="pt-3 mt-2 border-t border-gray-850 flex items-center justify-between">
-              <span className="text-[10px] font-mono font-bold text-amber-400">
-                {game.maxWin}
-              </span>
-              <span className="px-3 py-1 bg-amber-500 text-gray-950 rounded-lg text-xs font-black group-hover:bg-amber-400 transition-colors flex items-center gap-1">
-                <Play className="w-3 h-3 fill-current" /> Jouer
-              </span>
-            </div>
-          </Link>
-        ))}
+            </Link>
+          ))}
+        </div>
       </div>
     </div>
   );

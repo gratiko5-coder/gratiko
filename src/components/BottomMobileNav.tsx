@@ -26,6 +26,10 @@ import {
   Users,
   Settings,
   MessageCircle,
+  Send,
+  ExternalLink,
+  Award,
+  BookOpen,
 } from "lucide-react";
 
 interface BottomMobileNavProps {
@@ -49,11 +53,11 @@ export default function BottomMobileNav({ user }: BottomMobileNavProps) {
 
   return (
     <>
-      {/* Barre de navigation basse fixée sur mobile avec dégagement généreux des touches virtuelles Android (||| [] <) */}
+      {/* Barre de navigation basse fixée sur mobile (Style ParyajPam officiel épuré sans bandeau noir) */}
       <nav
-        className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-gray-950/98 backdrop-blur-xl border-t border-gray-800/90 px-2 pt-2.5 shadow-[0_-8px_30px_rgba(0,0,0,0.95)]"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#0c1424] border-t border-[#1a263d] px-1 pt-1.5 shadow-[0_-4px_20px_rgba(0,0,0,0.85)]"
         style={{
-          paddingBottom: "max(calc(env(safe-area-inset-bottom, 0px) + 26px), 48px)",
+          paddingBottom: "max(env(safe-area-inset-bottom, 8px), 8px)",
         }}
       >
         <div className="grid grid-cols-5 items-center justify-between text-center">
@@ -62,7 +66,7 @@ export default function BottomMobileNav({ user }: BottomMobileNavProps) {
             href="/sports?tab=live"
             className={`flex flex-col items-center py-1 transition-colors ${
               pathname.includes("/sports") && typeof window !== "undefined" && window.location.search.includes("tab=live")
-                ? "text-amber-400 font-bold"
+                ? "text-amber-400 font-black"
                 : "text-gray-400 hover:text-white"
             }`}
           >
@@ -74,8 +78,8 @@ export default function BottomMobileNav({ user }: BottomMobileNavProps) {
           <Link
             href="/sports"
             className={`flex flex-col items-center py-1 transition-colors ${
-              pathname === "/sports"
-                ? "text-amber-400 font-bold"
+              pathname === "/sports" && (typeof window === "undefined" || !window.location.search.includes("tab=live"))
+                ? "text-amber-400 font-black"
                 : "text-gray-400 hover:text-white"
             }`}
           >
@@ -83,12 +87,12 @@ export default function BottomMobileNav({ user }: BottomMobileNavProps) {
             <span className="text-[10px]">Sport</span>
           </Link>
 
-          {/* 3. Mes Paris (My Bets) */}
+          {/* 3. My Bets (Mes Paris) */}
           <Link
             href="/sports/my-bets"
             className={`flex flex-col items-center py-1 transition-colors ${
               pathname === "/sports/my-bets"
-                ? "text-amber-400 font-bold"
+                ? "text-amber-400 font-black"
                 : "text-gray-400 hover:text-white"
             }`}
           >
@@ -96,12 +100,12 @@ export default function BottomMobileNav({ user }: BottomMobileNavProps) {
             <span className="text-[10px]">My Bets</span>
           </Link>
 
-          {/* 4. Games (Lobby & Keno / Lucky6 / Scratch) */}
+          {/* 4. Games */}
           <Link
             href="/games"
             className={`flex flex-col items-center py-1 transition-colors ${
               pathname.includes("/games") || pathname.includes("/tickets")
-                ? "text-amber-400 font-bold"
+                ? "text-amber-400 font-black"
                 : "text-gray-400 hover:text-white"
             }`}
           >
@@ -113,7 +117,7 @@ export default function BottomMobileNav({ user }: BottomMobileNavProps) {
           <button
             onClick={() => setDrawerOpen(true)}
             className={`flex flex-col items-center py-1 transition-colors ${
-              drawerOpen ? "text-amber-400 font-bold" : "text-gray-400 hover:text-white"
+              drawerOpen ? "text-amber-400 font-black" : "text-gray-400 hover:text-white"
             }`}
           >
             <Menu className="w-5 h-5 mb-0.5" />
@@ -122,165 +126,165 @@ export default function BottomMobileNav({ user }: BottomMobileNavProps) {
         </div>
       </nav>
 
-      {/* Tiroir Menu Latéral Mobile (Modèle ParyajPam Panel 1) */}
+      {/* Tiroir Menu Latéral Mobile (Copie fidèle de la maquette Image 4) */}
       {drawerOpen && (
         <div className="md:hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex justify-end animate-in fade-in">
-          <div className="w-[85%] max-w-sm h-full bg-gray-950 border-l border-gray-800 p-4 flex flex-col justify-between shadow-2xl overflow-y-auto animate-in slide-in-from-right">
+          <div className="w-[85%] max-w-sm h-full bg-[#0a1120] border-l border-[#1a263d] p-4 flex flex-col justify-between shadow-2xl overflow-y-auto animate-in slide-in-from-right">
             <div className="space-y-4">
-              {/* Header avec Logo et bouton Fermer */}
+              {/* Header avec Drapeau et bouton Fermer */}
               <div className="flex items-center justify-between border-b border-gray-800 pb-3">
                 <div className="flex items-center gap-2">
-                  <img src="/logo.png" alt="GRATIKO" className="h-8 w-auto object-contain" />
-                  <span className="text-xs font-black text-amber-400 uppercase tracking-wider">
+                  <span className="text-xl">🇭🇹</span>
+                  <span className="text-sm font-black text-white tracking-wider">
                     GRATIKO
                   </span>
                 </div>
                 <button
                   onClick={() => setDrawerOpen(false)}
-                  className="p-1.5 rounded-lg bg-gray-900 text-gray-400 hover:text-white border border-gray-800"
+                  className="p-1 rounded-lg text-gray-400 hover:text-white"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
-              {/* Bannière Télécharger APK Android (comme sur la maquette Panel 1) */}
+              {/* Bannière Télécharger APK Android (Exactement comme Image 4) */}
               <a
                 href="/GRATIKO.apk"
                 download="GRATIKO.apk"
-                className="block relative overflow-hidden rounded-2xl bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 p-3.5 shadow-lg border border-amber-300 text-gray-950 group"
+                className="block relative overflow-hidden rounded-2xl bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 p-3 shadow-lg text-gray-950 group"
               >
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
-                    <span className="text-[10px] font-black uppercase tracking-wider bg-gray-950 text-amber-400 px-2 py-0.5 rounded">
-                      Application Officielle
-                    </span>
-                    <h4 className="text-sm font-black leading-tight">
-                      GRATIKO MOBILE APP
+                    <p className="text-[11px] font-bold text-gray-900 leading-tight">
+                      GRATIKO
+                    </p>
+                    <h4 className="text-base font-black leading-tight tracking-tight">
+                      MOBILE APP
                     </h4>
-                    <span className="inline-flex items-center gap-1 text-[11px] font-extrabold bg-gray-950 text-white px-2.5 py-1 rounded-lg mt-1 group-hover:bg-black transition-colors">
-                      <Download className="w-3.5 h-3.5 text-amber-400" />
+                    <span className="inline-flex items-center gap-1 text-[11px] font-black bg-blue-600 text-white px-3 py-1 rounded-lg mt-1 shadow">
                       Download apk
                     </span>
                   </div>
-                  <div className="w-12 h-12 bg-gray-950/20 rounded-2xl flex items-center justify-center">
-                    <Smartphone className="w-8 h-8 text-gray-950" />
+                  <div className="w-14 h-14 flex items-center justify-center">
+                    <Smartphone className="w-12 h-12 text-emerald-800 animate-bounce" />
                   </div>
                 </div>
               </a>
 
-              {/* Réseaux sociaux / Communauté */}
-              <div className="flex items-center justify-around py-2 bg-gray-900/80 rounded-xl border border-gray-800">
+              {/* 4 Cercles Sociaux (Instagram, WhatsApp, Telegram, Facebook comme sur Image 4) */}
+              <div className="flex items-center justify-around py-1.5">
+                <a
+                  href="https://instagram.com"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-10 h-10 rounded-full bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 text-white flex items-center justify-center shadow-md active:scale-95 transition-all"
+                  title="Instagram"
+                >
+                  <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                  </svg>
+                </a>
                 <a
                   href="https://wa.me/50937000000"
                   target="_blank"
                   rel="noreferrer"
-                  className="w-9 h-9 rounded-full bg-emerald-600/20 text-emerald-400 flex items-center justify-center hover:bg-emerald-600 hover:text-white transition-all"
+                  className="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-md active:scale-95 transition-all"
                   title="WhatsApp"
                 >
-                  <MessageCircle className="w-4 h-4" />
+                  <MessageCircle className="w-5 h-5" />
                 </a>
                 <a
                   href="https://t.me/gratiko"
                   target="_blank"
                   rel="noreferrer"
-                  className="w-9 h-9 rounded-full bg-sky-600/20 text-sky-400 flex items-center justify-center hover:bg-sky-600 hover:text-white transition-all"
+                  className="w-10 h-10 rounded-full bg-sky-500 text-white flex items-center justify-center shadow-md active:scale-95 transition-all"
                   title="Telegram"
                 >
-                  <Share2 className="w-4 h-4" />
+                  <Send className="w-5 h-5 ml-0.5" />
                 </a>
                 <a
-                  href="/legal/rules"
-                  onClick={() => setDrawerOpen(false)}
-                  className="w-9 h-9 rounded-full bg-amber-600/20 text-amber-400 flex items-center justify-center hover:bg-amber-600 hover:text-white transition-all"
-                  title="Règles"
+                  href="https://facebook.com"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-md active:scale-95 transition-all"
+                  title="Facebook"
                 >
-                  <FileText className="w-4 h-4" />
+                  <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                    <path d="M9 8H6v4h3v12h5V12h3.642L18 8h-4V6.333C14 5.374 14.5 5 15.5 5H18V0h-3.808C10.597 0 9 1.583 9 4.615V8z"/>
+                  </svg>
                 </a>
               </div>
 
-              {/* Statut utilisateur / Authentification */}
-              {user ? (
-                <div className="p-3 bg-gradient-to-br from-gray-900 to-gray-950 rounded-2xl border border-amber-500/30 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-[10px] text-gray-400 uppercase font-bold">Joueur connecté</p>
-                      <p className="text-xs font-black text-white truncate">{user.fullName}</p>
-                    </div>
-                    <span className="text-[10px] bg-amber-500/20 text-amber-300 font-bold px-2 py-0.5 rounded-full border border-amber-500/30">
-                      Vérifié
-                    </span>
-                  </div>
+              {/* Menu List Items (Conforme mot à mot à Image 4) */}
+              <div className="divide-y divide-gray-850/60 text-xs font-semibold text-gray-300">
+                <Link
+                  href="/legal/rules"
+                  onClick={() => setDrawerOpen(false)}
+                  className="flex items-center justify-between py-3 hover:text-white transition-colors"
+                >
+                  <span className="flex items-center gap-3">
+                    <BookOpen className="w-4 h-4 text-gray-400" />
+                    <span>Blog & Annonces</span>
+                  </span>
+                  <ChevronRight className="w-4 h-4 text-gray-600" />
+                </Link>
 
-                  <div className="flex gap-2 pt-1 border-t border-gray-800">
-                    <Link
-                      href="/wallet"
-                      onClick={() => setDrawerOpen(false)}
-                      className="flex-1 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-center text-[11px] rounded-lg transition-colors flex items-center justify-center gap-1"
-                    >
-                      <ArrowDownLeft className="w-3.5 h-3.5" /> Recharger
-                    </Link>
-                    <Link
-                      href="/wallet"
-                      onClick={() => setDrawerOpen(false)}
-                      className="flex-1 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-200 font-bold text-center text-[11px] rounded-lg transition-colors flex items-center justify-center gap-1"
-                    >
-                      <ArrowUpRight className="w-3.5 h-3.5" /> Retrait
-                    </Link>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex gap-2">
-                  <Link
-                    href="/auth/login"
-                    onClick={() => setDrawerOpen(false)}
-                    className="flex-1 py-2.5 text-center text-xs font-black text-white bg-gray-900 rounded-xl border border-gray-800 hover:bg-gray-800"
-                  >
-                    Connexion
-                  </Link>
-                  <Link
-                    href="/auth/register"
-                    onClick={() => setDrawerOpen(false)}
-                    className="flex-1 py-2.5 text-center text-xs font-black text-gray-950 bg-amber-400 rounded-xl hover:bg-amber-300"
-                  >
-                    Inscription
-                  </Link>
-                </div>
-              )}
-
-              {/* Menu List Items (identique à Panel 1 de la maquette) */}
-              <div className="space-y-1 text-xs font-bold text-gray-300">
                 <Link
                   href="/games"
                   onClick={() => setDrawerOpen(false)}
-                  className="flex items-center justify-between p-2.5 rounded-xl hover:bg-gray-900 transition-colors"
+                  className="flex items-center justify-between py-3 hover:text-white transition-colors"
                 >
-                  <span className="flex items-center gap-2.5">
-                    <Gamepad2 className="w-4 h-4 text-amber-400" />
-                    <span>Lobby des Jeux (Keno, Lucky 6, Grattage)</span>
+                  <span className="flex items-center gap-3">
+                    <Gift className="w-4 h-4 text-gray-400" />
+                    <span>Bonuses and special offers</span>
                   </span>
                   <ChevronRight className="w-4 h-4 text-gray-600" />
                 </Link>
 
                 <Link
-                  href="/sports"
+                  href="/games"
                   onClick={() => setDrawerOpen(false)}
-                  className="flex items-center justify-between p-2.5 rounded-xl hover:bg-gray-900 transition-colors"
+                  className="flex items-center justify-between py-3 hover:text-white transition-colors"
                 >
-                  <span className="flex items-center gap-2.5">
-                    <Trophy className="w-4 h-4 text-amber-400" />
-                    <span>Paris Sportifs (1X2 & Combinés)</span>
+                  <span className="flex items-center gap-3">
+                    <Award className="w-4 h-4 text-gray-400" />
+                    <span>Top wins (Meilleurs gains)</span>
                   </span>
                   <ChevronRight className="w-4 h-4 text-gray-600" />
                 </Link>
 
                 <Link
-                  href="/sports/my-bets"
+                  href="/legal/rules"
                   onClick={() => setDrawerOpen(false)}
-                  className="flex items-center justify-between p-2.5 rounded-xl hover:bg-gray-900 transition-colors"
+                  className="flex items-center justify-between py-3 hover:text-white transition-colors"
                 >
-                  <span className="flex items-center gap-2.5">
-                    <Ticket className="w-4 h-4 text-purple-400" />
-                    <span>Mes Paris & Coupons</span>
+                  <span className="flex items-center gap-3">
+                    <FileText className="w-4 h-4 text-gray-400" />
+                    <span>Sport betting Terms & conditions</span>
+                  </span>
+                  <ChevronRight className="w-4 h-4 text-gray-600" />
+                </Link>
+
+                <Link
+                  href="/legal/rules"
+                  onClick={() => setDrawerOpen(false)}
+                  className="flex items-center justify-between py-3 hover:text-white transition-colors"
+                >
+                  <span className="flex items-center gap-3">
+                    <Users className="w-4 h-4 text-gray-400" />
+                    <span>Partners (Agents MonCash / NatCash)</span>
+                  </span>
+                  <ChevronRight className="w-4 h-4 text-gray-600" />
+                </Link>
+
+                <Link
+                  href="/legal/privacy"
+                  onClick={() => setDrawerOpen(false)}
+                  className="flex items-center justify-between py-3 hover:text-white transition-colors"
+                >
+                  <span className="flex items-center gap-3">
+                    <HelpCircle className="w-4 h-4 text-gray-400" />
+                    <span>About (À propos de GRATIKO)</span>
                   </span>
                   <ChevronRight className="w-4 h-4 text-gray-600" />
                 </Link>
@@ -288,50 +292,47 @@ export default function BottomMobileNav({ user }: BottomMobileNavProps) {
                 <Link
                   href="/wallet"
                   onClick={() => setDrawerOpen(false)}
-                  className="flex items-center justify-between p-2.5 rounded-xl hover:bg-gray-900 transition-colors"
+                  className="flex items-center justify-between py-3 hover:text-white transition-colors"
                 >
-                  <span className="flex items-center gap-2.5">
-                    <Wallet className="w-4 h-4 text-emerald-400" />
-                    <span>Mon Portefeuille (MonCash & NatCash)</span>
+                  <span className="flex items-center gap-3">
+                    <Settings className="w-4 h-4 text-gray-400" />
+                    <span>Settings & Portefeuille</span>
                   </span>
                   <ChevronRight className="w-4 h-4 text-gray-600" />
                 </Link>
 
-                <div className="my-2 border-t border-gray-850" />
-
-                <Link
-                  href="/legal/rules"
-                  onClick={() => setDrawerOpen(false)}
-                  className="flex items-center justify-between p-2.5 rounded-xl hover:bg-gray-900 transition-colors text-gray-400 hover:text-white"
+                <a
+                  href="/GRATIKO.apk"
+                  download="GRATIKO.apk"
+                  className="flex items-center justify-between py-3 hover:text-white transition-colors text-amber-400 font-bold"
                 >
-                  <span className="flex items-center gap-2.5">
-                    <FileText className="w-4 h-4 text-gray-400" />
-                    <span>Conditions Générales & Paris</span>
+                  <span className="flex items-center gap-3">
+                    <ExternalLink className="w-4 h-4 text-amber-400" />
+                    <span>Download app (APK)</span>
                   </span>
-                  <ChevronRight className="w-4 h-4 text-gray-600" />
-                </Link>
+                  <ChevronRight className="w-4 h-4 text-amber-400" />
+                </a>
 
-                <Link
-                  href="/legal/risks"
-                  onClick={() => setDrawerOpen(false)}
-                  className="flex items-center justify-between p-2.5 rounded-xl hover:bg-gray-900 transition-colors text-gray-400 hover:text-white"
-                >
-                  <span className="flex items-center gap-2.5">
-                    <Shield className="w-4 h-4 text-gray-400" />
-                    <span>Jeu Responsable (+18)</span>
-                  </span>
-                  <ChevronRight className="w-4 h-4 text-gray-600" />
-                </Link>
-
-                {user && user.role !== "PLAYER" && (
-                  <Link
-                    href="/admin"
-                    onClick={() => setDrawerOpen(false)}
-                    className="flex items-center justify-between p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 font-black mt-2"
+                {user ? (
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center justify-between py-3 text-red-400 hover:text-red-300 font-bold"
                   >
-                    <span className="flex items-center gap-2.5">
-                      <Shield className="w-4 h-4 text-amber-400" />
-                      <span>Espace Super Admin</span>
+                    <span className="flex items-center gap-3">
+                      <LogOut className="w-4 h-4 text-red-400" />
+                      <span>Déconnexion ({user.fullName})</span>
+                    </span>
+                    <ChevronRight className="w-4 h-4 text-red-400" />
+                  </button>
+                ) : (
+                  <Link
+                    href="/auth/login"
+                    onClick={() => setDrawerOpen(false)}
+                    className="flex items-center justify-between py-3 text-amber-400 font-bold"
+                  >
+                    <span className="flex items-center gap-3">
+                      <Users className="w-4 h-4 text-amber-400" />
+                      <span>Login / Connexion</span>
                     </span>
                     <ChevronRight className="w-4 h-4 text-amber-400" />
                   </Link>
@@ -339,19 +340,10 @@ export default function BottomMobileNav({ user }: BottomMobileNavProps) {
               </div>
             </div>
 
-            {/* Pied du menu */}
-            <div className="pt-4 border-t border-gray-800 space-y-3">
-              {user && (
-                <button
-                  onClick={handleLogout}
-                  className="w-full py-2.5 flex items-center justify-center gap-2 text-xs font-bold text-red-400 bg-red-950/20 hover:bg-red-950/40 rounded-xl border border-red-500/20 transition-colors"
-                >
-                  <LogOut className="w-4 h-4" /> Déconnexion
-                </button>
-              )}
-              <p className="text-[10px] text-gray-600 text-center font-mono">
-                GRATIKO v2.6.0 • Ayiti & Entènasyonal
-              </p>
+            {/* Version comme en bas à droite sur Image 4 */}
+            <div className="pt-3 border-t border-gray-850 flex items-center justify-between text-[11px] text-gray-500 font-mono">
+              <span>Haïti & International</span>
+              <span>2.36.6</span>
             </div>
           </div>
         </div>

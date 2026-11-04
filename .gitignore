@@ -18,8 +18,10 @@ android/build/
 android/.gradle/
 android/local.properties
 
-# Local APK in root
+# Local APK in root and public
 /GRATIKO.apk
+*.apk
+public/*.apk
 
 # Local Environment Variables & Secrets
 .env

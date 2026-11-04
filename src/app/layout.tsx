@@ -49,7 +49,7 @@ export default async function RootLayout({
         {process.env.APP_MODE !== "PRODUCTION" && <DemoBanner notice={t.common.demoNotice} />}
         <Header user={user} t={t} currentLocale={localeCookie} />
         <JackpotTickerBanner />
-        <main className="flex-1 w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 pb-36 overflow-x-hidden">
+        <main className="flex-1 w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 pb-20 md:pb-8 overflow-x-hidden">
           {children}
         </main>
         <Footer t={t} />
