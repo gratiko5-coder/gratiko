@@ -418,13 +418,15 @@ export default function SportsBettingPage() {
             </div>
           )}
 
-          <button
-            disabled={placingBet || selections.length === 0}
-            onClick={handlePlaceBet}
-            className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-black rounded-xl text-sm shadow-[0_4px_16px_rgba(16,185,129,0.35)] transition-all flex items-center justify-center gap-2 uppercase tracking-wider disabled:opacity-50"
-          >
-            {placingBet ? "Validation en cours..." : "PLACER MON PARI"}
-          </button>
+          <div className="pt-2 pb-6">
+            <button
+              disabled={placingBet || selections.length === 0}
+              onClick={handlePlaceBet}
+              className="w-full py-4 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-black rounded-xl text-base shadow-[0_4px_24px_rgba(16,185,129,0.5)] transition-all flex items-center justify-center gap-2 uppercase tracking-wider disabled:opacity-50"
+            >
+              {placingBet ? "Validation en cours..." : "PLACER MON PARI"}
+            </button>
+          </div>
         </div>
       )}
     </div>
@@ -714,11 +716,11 @@ export default function SportsBettingPage() {
 
       {/* Tiroir Modal Mobile du Panier */}
       {mobileSlipOpen && (
-        <div className="lg:hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex flex-col justify-end">
+        <div className="lg:hidden fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex flex-col justify-end">
           <div
-            className="bg-[#0c1424] border-t border-[#1b2b48] rounded-t-3xl p-4 space-y-3 max-h-[85vh] overflow-y-auto shadow-2xl"
+            className="bg-[#0c1424] border-t border-[#1b2b48] rounded-t-3xl p-4 space-y-3 max-h-[88vh] overflow-y-auto shadow-2xl"
             style={{
-              paddingBottom: "max(env(safe-area-inset-bottom, 8px), 16px)",
+              paddingBottom: "max(calc(env(safe-area-inset-bottom, 0px) + 36px), 52px)",
             }}
           >
             <div className="flex items-center justify-between border-b border-gray-800 pb-3">

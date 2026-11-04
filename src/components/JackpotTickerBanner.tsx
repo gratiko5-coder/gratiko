@@ -6,11 +6,11 @@ import { usePathname } from "next/navigation";
 export default function JackpotTickerBanner() {
   const pathname = usePathname();
 
-  // Masquer automatiquement le système de jackpot dès que l'utilisateur clique sur un jeu
-  // (Lucky 6, Keno 80, Roue de la fortune, Pile ou face, Loto minute, Grattage de ticket)
+  // Masquer automatiquement le système de jackpot dès que l'utilisateur est dans les jeux
+  // (Lobby /games, Lucky 6, Keno 80, Roue de la fortune, Pile ou face, Loto minute, Grattage de ticket)
   const isInsideGame =
-    pathname.startsWith("/games/") ||
-    pathname.startsWith("/tickets/");
+    pathname.startsWith("/games") ||
+    pathname.startsWith("/tickets");
 
   const [jackpots, setJackpots] = useState<{
     silver: number;

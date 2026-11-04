@@ -98,10 +98,7 @@ export default function Header({ user, t, currentLocale }: HeaderProps) {
 
   return (
     <header
-      className="sticky top-0 z-50 bg-[#0a1120]/98 backdrop-blur-md border-b border-[#18263e] w-full max-w-full overflow-hidden transition-all"
-      style={{
-        paddingTop: "max(calc(env(safe-area-inset-top, 0px) + 6px), 24px)",
-      }}
+      className="sticky top-0 z-50 bg-[#0a1120]/98 backdrop-blur-md border-b border-[#18263e] w-full max-w-full overflow-hidden transition-all safe-top-header"
     >
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
         {/* Logo GRATIKO */}

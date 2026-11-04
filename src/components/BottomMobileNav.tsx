@@ -128,8 +128,14 @@ export default function BottomMobileNav({ user }: BottomMobileNavProps) {
 
       {/* Tiroir Menu Latéral Mobile (Copie fidèle de la maquette Image 4) */}
       {drawerOpen && (
-        <div className="md:hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex justify-end animate-in fade-in">
-          <div className="w-[85%] max-w-sm h-full bg-[#0a1120] border-l border-[#1a263d] p-4 flex flex-col justify-between shadow-2xl overflow-y-auto animate-in slide-in-from-right">
+        <div className="md:hidden fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex justify-end animate-in fade-in">
+          <div
+            className="w-[85%] max-w-sm h-full bg-[#0a1120] border-l border-[#1a263d] px-4 pb-6 flex flex-col justify-between shadow-2xl overflow-y-auto animate-in slide-in-from-right"
+            style={{
+              paddingTop: "max(calc(env(safe-area-inset-top, 0px) + 16px), 52px)",
+              paddingBottom: "max(calc(env(safe-area-inset-bottom, 0px) + 24px), 32px)",
+            }}
+          >
             <div className="space-y-4">
               {/* Header avec Drapeau et bouton Fermer */}
               <div className="flex items-center justify-between border-b border-gray-800 pb-3">
